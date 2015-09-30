@@ -1,4 +1,7 @@
 CHANGELOG
 
+Version 0.1.1
+- Fixed a bug in the Heatmap Marker Selection which potentially influences the results
+
 Version 0.1
 - Introduced versioning. No changelog available behind this point.
