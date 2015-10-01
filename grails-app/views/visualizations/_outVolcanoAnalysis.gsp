@@ -29,9 +29,18 @@
         pointer-events: none;
     }
 
-    .significanceLine {
+    .pLine {
         stroke: red;
-        stroke-width: 1px;
+        stroke-width: 2px;
+    }
+
+    .logFCLine {
+        stroke: #0000FF;
+        stroke-width: 2px;
+    }
+
+    .axisText {
+        font-size: 14px;
     }
 </style>
 
@@ -109,12 +118,14 @@
     .call(yAxis);
 
     volcanoplot.append('text')
+    .attr('class', 'axisText')
     .attr('x', width / 2)
     .attr('y', height + 40)
     .attr('text-anchor', 'middle')
     .text('Log2 Fold Change');
 
     volcanoplot.append('text')
+    .attr('class', 'axisText')
     .attr('text-anchor', 'middle')
     .attr("transform", "translate(" + (-40) + "," + (height / 2) + ")rotate(-90)")
     .text('Negative Log10 p-Value');
@@ -124,19 +135,49 @@
     .style("visibility", "hidden");
 
     volcanoplot.append('line')
-    .attr('class', 'significanceLine')
+    .attr('class', 'pLine')
     .attr('x1', 0)
     .attr('y1', y(- Math.log10(0.05)))
     .attr('x2', width)
     .attr('y2', y(- Math.log10(0.05)));
+
+    volcanoplot.append('line')
+    .attr('class', 'logFCLine')
+    .attr('x1', x(-0.5))
+    .attr('y1', height)
+    .attr('x2', x(-0.5))
+    .attr('y2', 0);
+
+    volcanoplot.append('line')
+    .attr('class', 'logFCLine')
+    .attr('x1', x(0.5))
+    .attr('y1', height)
+    .attr('x2', x(0.5))
+    .attr('y2', 0);
 
     volcanoplot.append('text')
     .attr('x', width + 5)
     .attr('y', y(- Math.log10(0.05)))
     .attr('dy', '0.35em')
     .attr("text-anchor", "start")
-    .text('p-Value=0.05')
+    .text('p = 0.05')
     .style('fill', 'red');
+
+    volcanoplot.append('text')
+    .attr('x', x(-0.5))
+    .attr('y', - 15)
+    .attr('dy', '0.35em')
+    .attr("text-anchor", "middle")
+    .text('log2FC = -0.5')
+    .style('fill', '#0000FF');
+
+    volcanoplot.append('text')
+    .attr('x', x(0.5))
+    .attr('y', - 15)
+    .attr('dy', '0.35em')
+    .attr("text-anchor", "middle")
+    .text('log2FC = 0.5')
+    .style('fill', '#0000FF');
 
     function customColorSet() {
         var colorSet = [];
@@ -148,10 +189,14 @@
         return colorSet;
     }
 
+    var absLogFCs = jQuery.map(logFCs, function(d) { return Math.abs(d); });
+    var pValuesMinMax = d3.extent(pValues);
+    var logFCsMinMax = d3.extent(absLogFCs);
     var colorScale = d3.scale.quantile()
-    .domain(d3.extent(pValues))
+    .domain([pValuesMinMax[0] * logFCsMinMax[0], pValuesMinMax[1] * logFCsMinMax[1]])
     .range(customColorSet());
 
+    var oo5p = - Math.log10(0.05);
     function updateVolcano() {
         var point = volcanoplot.selectAll(".point")
         .data(points, function(d) { return d.uid; });
@@ -162,10 +207,27 @@
         .attr("cx", function(d) { return x(d.logFC); })
         .attr("cy", function(d) { return y(d.pValue); })
         .attr("r", 4)
-        .style("fill", function(d) { return colorScale(d.pValue); })
+        // .attr('visibility', function(d) {
+        //     if (d.pValue < oo5p && Math.abs(d.logFC) < 0.5) {
+        //         return 'hidden';
+        //     } else {
+        //         return 'visible';
+        //     }
+        // })
+        .style("fill", function(d) {
+            if (d.pValue < oo5p && Math.abs(d.logFC) < 0.5) {
+                return '#000000';
+            } else if (d.pValue >= oo5p && Math.abs(d.logFC) < 0.5) {
+                return '#FF0000';
+            } else if (d.pValue >= oo5p && Math.abs(d.logFC) >= 0.5) {
+                return '#00FF00';
+            } else {
+                return '#0000FF';
+            }
+        })
         .on("mouseover", function(d) {
             tooltip.style("visibility", "visible")
-            .html("p-Value: " + d.pValue + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe)
+            .html("- Log10 p-Value: " + d.pValue + "<br/>" + "Real p-Value:" + (Math.pow(10, - d.pValue)).toFixed(4) + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe)
             .style("left", mouseX() + "px")
             .style("top", mouseY() + "px");
         })
