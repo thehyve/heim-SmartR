@@ -28,6 +28,13 @@ extractMatrixValues <- function(HDD.matrix) {
     valueMatrix
 }
 
+getZScoreMatrix <- function(valueMatrix) {
+    colNames <- colnames(valueMatrix)
+    zScoreMatrix <- t(apply(valueMatrix, 1, scale))
+    colnames(zScoreMatrix) <- colNames
+    zScoreMatrix
+}
+
 HDD.value.matrix.cohort1 <- getHDDMatrix(data.cohort1$mRNAData)
 HDD.value.matrix.cohort2 <- getHDDMatrix(data.cohort2$mRNAData)
 
@@ -38,7 +45,10 @@ valueMatrix.cohort1 <- extractMatrixValues(HDD.value.matrix.cohort1)
 valueMatrix.cohort2 <- extractMatrixValues(HDD.value.matrix.cohort2)
 
 valueMatrix <- cbind(valueMatrix.cohort1, valueMatrix.cohort2)
-HDD.value.matrix <- cbind(HDD.value.matrix.cohort1[, 1:2], valueMatrix)
+patientIDs <- as.numeric(sub("^X", "", colnames(valueMatrix)))
+colnames(valueMatrix) <- patientIDs
+zScoreMatrix <- getZScoreMatrix(valueMatrix)
+HDD.zScore.matrix <- cbind(HDD.value.matrix.cohort1[, 1:2], zScoreMatrix)
 
 colNum <- ncol(HDD.value.matrix.cohort1) - 2
 classVectorS1 <- c(rep(1, colNum), rep(2, ncol(valueMatrix) - colNum))
@@ -60,10 +70,12 @@ top.fit = data.frame(
 
 pValues <- -log10(top.fit$P.Value)
 logFCs <- top.fit$logFC
-probes <- HDD.value.matrix$PROBE
-geneSymbols <- HDD.value.matrix$GENESYMBOL
+probes <- HDD.zScore.matrix$PROBE
+geneSymbols <- HDD.zScore.matrix$GENESYMBOL
 
 output$probes <- probes
 output$geneSymbols <- geneSymbols
 output$pValues <- pValues
 output$logFCs <- logFCs
+output$patientIDs <- patientIDs
+output$zScoreMatrix <- HDD.zScore.matrix

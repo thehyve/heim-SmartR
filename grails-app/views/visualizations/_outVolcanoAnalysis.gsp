@@ -6,8 +6,7 @@
 	}
 
     .point {
-        stroke: black;
-        stroke-width: 1px;
+
     }
 
     .axis path,
@@ -29,14 +28,20 @@
         pointer-events: none;
     }
 
+    .square {
+
+    }
+
     .pLine {
         stroke: red;
         stroke-width: 2px;
+        shape-rendering: crispEdges;
     }
 
     .logFCLine {
         stroke: #0000FF;
         stroke-width: 2px;
+        shape-rendering: crispEdges;
     }
 
     .axisText {
@@ -53,7 +58,7 @@
 </div>
 
 <script>
-    var animationDuration = 1000;
+    var animationDuration = 500;
     var tmpAnimationDuration = animationDuration;
     function switchAnimation(checked) {
         if (! checked) {
@@ -69,6 +74,7 @@
     var geneSymbols = results.geneSymbols;
     var pValues = results.pValues;
     var logFCs = results.logFCs;
+    var patientIDs = results.patientIDs;
     var points = jQuery.map(pValues, function(d, i) {
         return {pValue: pValues[i],
                 logFC: logFCs[i],
@@ -77,7 +83,7 @@
                 uid: i
         };
     });
-
+    var zScoreMatrix = results.zScoreMatrix;
     var margin = {top: 100, right: 100, bottom: 100, left: 100};
     var width = 1200 - margin.left - margin.right;
     var height = 800 - margin.top - margin.bottom;
@@ -196,6 +202,97 @@
     .domain([pValuesMinMax[0] * logFCsMinMax[0], pValuesMinMax[1] * logFCsMinMax[1]])
     .range(customColorSet());
 
+    function redGreen() {
+        var colorSet = [];
+        var NUM = 100;
+        var i = NUM;
+        while(i--) {
+            colorSet.push(d3.rgb((255 * i) / NUM, 0, 0));
+        }
+        i = NUM;
+        while(i--) {
+            colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
+        }
+        return colorSet;
+    }
+
+    var colorScale = d3.scale.quantile()
+    .domain([0, 1])
+    .range(redGreen());
+
+    function getColor(point) {
+        if (point.pValue < oo5p && Math.abs(point.logFC) < 0.5) {
+            return '#000000';
+        }
+        if (point.pValue >= oo5p && Math.abs(point.logFC) < 0.5) {
+            return '#FF0000';
+        }
+        if (point.pValue >= oo5p && Math.abs(point.logFC) >= 0.5) {
+            return '#00FF00';
+        }
+        return '#0000FF';
+    }
+
+    var miniHeatmap = volcanoplot.append("g");
+    function resetMiniHeatmap() {
+        miniHeatmap.selectAll('*').remove();
+    }
+
+    function drawMiniHeatmap(point) {
+        var gridFieldWidth = 20;
+        var gridFieldHeight = 20;
+
+        var square = miniHeatmap.selectAll('.square')
+        .data(patientIDs, function(d) { return d; });
+
+        square
+        .enter()
+        .append("rect")
+        .attr('class', 'square')
+        .attr("x", function(d) {
+            return x(point.logFC);
+        })
+        .attr("y", function() {
+            return y(point.pValue) - gridFieldHeight;
+        })
+        .attr("width", gridFieldWidth)
+        .attr("height", gridFieldHeight)
+        .style("fill", function(patientID) {
+            var entry;
+            for (var i = 0; i < zScoreMatrix.length; i++) {
+                entry = zScoreMatrix[i];
+                if (entry.PROBE === point.probe) {
+                    break;
+                }
+            }
+            return colorScale(1 / (1 + Math.pow(Math.E, - entry[patientID])));
+        });
+
+        square
+        .transition()
+        .duration(animationDuration)
+        .attr("x", function(d) {
+            return x(point.logFC) + patientIDs.indexOf(d) * gridFieldWidth;
+        });
+
+        var miniHeatmapText = miniHeatmap.selectAll('.miniHeatmapText')
+        .data(patientIDs, function(d) { return d; });
+
+        miniHeatmapText
+        .enter()
+        .append("text")
+        .attr('class', 'text miniHeatmapText')
+        .attr("transform", "translate(" + (x(point.logFC) + gridFieldWidth / 2) + "," + (y(point.pValue) - gridFieldHeight - 8) + ")rotate(-45)")
+        .attr('dy', '0.35em')
+        .attr("text-anchor", "start")
+        .text(function(d) { return d; });
+
+        miniHeatmapText
+        .transition()
+        .duration(animationDuration)
+        .attr("transform", function(d) { return "translate(" + (x(point.logFC) + gridFieldWidth / 2 + patientIDs.indexOf(d) * gridFieldWidth) + "," + (y(point.pValue) - gridFieldHeight - 8) + ")rotate(-45)"; });
+    }
+
     var oo5p = - Math.log10(0.05);
     function updateVolcano() {
         var point = volcanoplot.selectAll(".point")
@@ -206,32 +303,21 @@
         .attr("class", function(d) { return "point probe-" + d.probe; })
         .attr("cx", function(d) { return x(d.logFC); })
         .attr("cy", function(d) { return y(d.pValue); })
-        .attr("r", 4)
-        // .attr('visibility', function(d) {
-        //     if (d.pValue < oo5p && Math.abs(d.logFC) < 0.5) {
-        //         return 'hidden';
-        //     } else {
-        //         return 'visible';
-        //     }
-        // })
-        .style("fill", function(d) {
-            if (d.pValue < oo5p && Math.abs(d.logFC) < 0.5) {
-                return '#000000';
-            } else if (d.pValue >= oo5p && Math.abs(d.logFC) < 0.5) {
-                return '#FF0000';
-            } else if (d.pValue >= oo5p && Math.abs(d.logFC) >= 0.5) {
-                return '#00FF00';
-            } else {
-                return '#0000FF';
-            }
-        })
+        .attr("r", 3)
+        .style("fill", function(d) { return getColor(d); })
         .on("mouseover", function(d) {
-            tooltip.style("visibility", "visible")
-            .html("- Log10 p-Value: " + d.pValue + "<br/>" + "Real p-Value:" + (Math.pow(10, - d.pValue)).toFixed(4) + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe)
+            drawMiniHeatmap(d);
+
+            var html = "- Log10 p-Value: " + d.pValue + "<br/>" + "Real p-Value:" + (Math.pow(10, - d.pValue)).toFixed(4) + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe;
+
+            tooltip
+            .style("visibility", "visible")
+            .html(html)
             .style("left", mouseX() + "px")
             .style("top", mouseY() + "px");
         })
         .on("mouseout", function(d) {
+            resetMiniHeatmap();
             tooltip.style("visibility", "hidden");
         });
 
