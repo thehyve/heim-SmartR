@@ -23,8 +23,8 @@
         padding: 0px;
         font-size: 12px;
         font-weight: bold;
-        color: black;
-        background: white;
+        color: #FFFFFF;
+        background: #123456;
         pointer-events: none;
     }
 
@@ -47,17 +47,38 @@
     .axisText {
         font-size: 14px;
     }
+
+    .brush .extent {
+        fill: blue;
+        opacity: .25;
+        shape-rendering: crispEdges;
+    }
+
+    .mytable, .myth, .mytd {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    .myth, .mytd {
+        padding: 15px;
+    }
 </style>
 
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <g:javascript src="resource/d3.js"/>
 
 <div id="visualization">
-    <div id="controls" style='float: left; padding-right: 10px'></div>
-    <div id="volcanoplot" style='float: left; padding-right: 10px'></div>
+    <div id="volcanocontrols" style='float: left; padding-right: 10px'></div>
+    <div id="volcanoplot" style='float: left; padding-right: 10px'></div><br/>
+    <div id="volcanotable" style='float: left; padding-right: 10px'></div>
 </div>
 
 <script>
+    d3.selection.prototype.moveToFront = function() {
+        return this.each(function(){
+            this.parentNode.appendChild(this);
+        });
+    };
     var animationDuration = 500;
     var tmpAnimationDuration = animationDuration;
     function switchAnimation(checked) {
@@ -88,13 +109,17 @@
     var width = 1200 - margin.left - margin.right;
     var height = 800 - margin.top - margin.bottom;
 
+    var volcanotable = d3.select("#volcanotable").append("table")
+    .attr("width", width)
+    .attr("height", height);
+
     var volcanoplot = d3.select("#volcanoplot").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var controls = d3.select("#controls").append("svg")
+    var controls = d3.select("#volcanocontrols").append("svg")
     .attr("width", 220)
     .attr("height", height * 2);
 
@@ -185,6 +210,44 @@
     .text('log2FC = 0.5')
     .style('fill', '#0000FF');
 
+    var brush = d3.svg.brush()
+    .x(d3.scale.identity().domain([-20, width + 20]))
+    .y(d3.scale.identity().domain([-20, height + 20]))
+    .on("brushend", function() {
+        updateSelection();
+    });
+
+    volcanoplot.append("g")
+    .attr("class", "brush")
+    .on("mousedown", function(){
+        if(d3.event.button === 2){
+            d3.event.stopImmediatePropagation();
+        }
+    })
+    .call(brush);
+
+    function updateSelection(cohort) {
+        var selection = [];
+        d3.selectAll('.point')
+        .classed('brushed', false);
+
+        var extent = brush.extent();
+        var left = extent[0][0],
+            top = extent[0][1],
+            right = extent[1][0],
+            bottom = extent[1][1];
+
+        d3.selectAll('.point').each(function(d) {
+            var point = d3.select(this);
+            if (y(d.pValue) >= top && y(d.pValue) <= bottom && x(d.logFC) >= left && x(d.logFC) <= right) {
+                point
+                .classed('brushed', true);
+                selection.push(d);
+            }
+        });
+        drawVolcanotable(selection);
+    }
+
     function customColorSet() {
         var colorSet = [];
         var NUM = 100;
@@ -241,6 +304,13 @@
     function drawMiniHeatmap(point) {
         var gridFieldWidth = 20;
         var gridFieldHeight = 20;
+        var entry;
+        for (var i = 0; i < zScoreMatrix.length; i++) {
+            entry = zScoreMatrix[i];
+            if (entry.PROBE === point.probe) {
+                break;
+            }
+        }
 
         var square = miniHeatmap.selectAll('.square')
         .data(patientIDs, function(d) { return d; });
@@ -249,22 +319,11 @@
         .enter()
         .append("rect")
         .attr('class', 'square')
-        .attr("x", function(d) {
-            return x(point.logFC);
-        })
-        .attr("y", function() {
-            return y(point.pValue) - gridFieldHeight;
-        })
+        .attr("x", 0)
+        .attr("y", height + 10)
         .attr("width", gridFieldWidth)
         .attr("height", gridFieldHeight)
         .style("fill", function(patientID) {
-            var entry;
-            for (var i = 0; i < zScoreMatrix.length; i++) {
-                entry = zScoreMatrix[i];
-                if (entry.PROBE === point.probe) {
-                    break;
-                }
-            }
             return colorScale(1 / (1 + Math.pow(Math.E, - entry[patientID])));
         });
 
@@ -272,7 +331,7 @@
         .transition()
         .duration(animationDuration)
         .attr("x", function(d) {
-            return x(point.logFC) + patientIDs.indexOf(d) * gridFieldWidth;
+            return patientIDs.indexOf(d) * gridFieldWidth;
         });
 
         var miniHeatmapText = miniHeatmap.selectAll('.miniHeatmapText')
@@ -282,7 +341,7 @@
         .enter()
         .append("text")
         .attr('class', 'text miniHeatmapText')
-        .attr("transform", "translate(" + (x(point.logFC) + gridFieldWidth / 2) + "," + (y(point.pValue) - gridFieldHeight - 8) + ")rotate(-45)")
+        .attr("transform", "translate(" + 0  + "," + height + ")rotate(-45)")
         .attr('dy', '0.35em')
         .attr("text-anchor", "start")
         .text(function(d) { return d; });
@@ -290,7 +349,49 @@
         miniHeatmapText
         .transition()
         .duration(animationDuration)
-        .attr("transform", function(d) { return "translate(" + (x(point.logFC) + gridFieldWidth / 2 + patientIDs.indexOf(d) * gridFieldWidth) + "," + (y(point.pValue) - gridFieldHeight - 8) + ")rotate(-45)"; });
+        .attr("transform", function(d) { return "translate(" + (gridFieldWidth / 2 + patientIDs.indexOf(d) * gridFieldWidth) + "," + height + ")rotate(-45)"; });
+
+        miniHeatmap.moveToFront();
+    }
+
+    function resetVolcanotable() {
+        d3.select('#volcanotable').selectAll('*').remove();
+    }
+
+    function drawVolcanotable(points) {
+        resetVolcanotable();
+        var columns = ["probe", "geneSymbol", "logFC", "pValue"];
+
+        var table = d3.select('#volcanotable').append("table")
+        .attr('class', 'mytable');
+        var thead = table.append("thead");
+        var tbody = table.append("tbody");
+
+        thead.append("tr")
+        .attr('class', 'mytr')
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+        .attr('class', 'myth')
+        .text(function(column) { return column; });
+
+        var rows = tbody.selectAll("tr")
+        .data(points)
+        .enter()
+        .append("tr")
+        .attr('class', 'mytr');
+
+        var cells = rows.selectAll("td")
+        .data(function(row) {
+            return columns.map(function(column) {
+                return {column: column, value: row[column]};
+            });
+        })
+        .enter()
+        .append("td")
+        .attr('class', 'mytd')
+        .text(function(d) { return d.value; });
     }
 
     var oo5p = - Math.log10(0.05);
@@ -307,7 +408,6 @@
         .style("fill", function(d) { return getColor(d); })
         .on("mouseover", function(d) {
             drawMiniHeatmap(d);
-
             var html = "- Log10 p-Value: " + d.pValue + "<br/>" + "Real p-Value:" + (Math.pow(10, - d.pValue)).toFixed(4) + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe;
 
             tooltip
