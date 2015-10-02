@@ -60,7 +60,7 @@
     }
 
     .myth, .mytd {
-        padding: 15px;
+        padding: 5px;
     }
 </style>
 
@@ -94,10 +94,12 @@
     var probes = results.probes;
     var geneSymbols = results.geneSymbols;
     var pValues = results.pValues;
+    var logPs = results.logPs;
     var logFCs = results.logFCs;
     var patientIDs = results.patientIDs;
-    var points = jQuery.map(pValues, function(d, i) {
+    var points = jQuery.map(logPs, function(d, i) {
         return {pValue: pValues[i],
+                logP: logPs[i],
                 logFC: logFCs[i],
                 probe: probes[i],
                 geneSymbol: geneSymbols[i],
@@ -128,7 +130,7 @@
     .range([0, width]);
 
     var y = d3.scale.linear()
-    .domain(d3.extent(pValues))
+    .domain(d3.extent(logPs))
     .range([height, 0]);
 
     var xAxis = d3.svg.axis()
@@ -239,7 +241,7 @@
 
         d3.selectAll('.point').each(function(d) {
             var point = d3.select(this);
-            if (y(d.pValue) >= top && y(d.pValue) <= bottom && x(d.logFC) >= left && x(d.logFC) <= right) {
+            if (y(d.logP) >= top && y(d.logP) <= bottom && x(d.logFC) >= left && x(d.logFC) <= right) {
                 point
                 .classed('brushed', true);
                 selection.push(d);
@@ -259,10 +261,10 @@
     }
 
     var absLogFCs = jQuery.map(logFCs, function(d) { return Math.abs(d); });
-    var pValuesMinMax = d3.extent(pValues);
+    var logPsMinMax = d3.extent(logPs);
     var logFCsMinMax = d3.extent(absLogFCs);
     var colorScale = d3.scale.quantile()
-    .domain([pValuesMinMax[0] * logFCsMinMax[0], pValuesMinMax[1] * logFCsMinMax[1]])
+    .domain([logPsMinMax[0] * logFCsMinMax[0], logPsMinMax[1] * logFCsMinMax[1]])
     .range(customColorSet());
 
     function redGreen() {
@@ -284,13 +286,13 @@
     .range(redGreen());
 
     function getColor(point) {
-        if (point.pValue < oo5p && Math.abs(point.logFC) < 0.5) {
+        if (point.logP < oo5p && Math.abs(point.logFC) < 0.5) {
             return '#000000';
         }
-        if (point.pValue >= oo5p && Math.abs(point.logFC) < 0.5) {
+        if (point.logP >= oo5p && Math.abs(point.logFC) < 0.5) {
             return '#FF0000';
         }
-        if (point.pValue >= oo5p && Math.abs(point.logFC) >= 0.5) {
+        if (point.logP >= oo5p && Math.abs(point.logFC) >= 0.5) {
             return '#00FF00';
         }
         return '#0000FF';
@@ -360,8 +362,8 @@
 
     function drawVolcanotable(points) {
         resetVolcanotable();
-        var columns = ["probe", "geneSymbol", "logFC", "pValue"];
-
+        var columns = ["probe", "geneSymbol", "logFC", "logP", 'pValue'];
+        var HEADER = ["ProbeID", 'Genesymbol', "Log2 FC", "-Log10 p", "Real p"];
         var table = d3.select('#volcanotable').append("table")
         .attr('class', 'mytable');
         var thead = table.append("thead");
@@ -370,11 +372,11 @@
         thead.append("tr")
         .attr('class', 'mytr')
         .selectAll("th")
-        .data(columns)
+        .data(HEADER)
         .enter()
         .append("th")
         .attr('class', 'myth')
-        .text(function(column) { return column; });
+        .text(function(d) { return d; });
 
         var rows = tbody.selectAll("tr")
         .data(points)
@@ -403,12 +405,12 @@
         .append("circle")
         .attr("class", function(d) { return "point probe-" + d.probe; })
         .attr("cx", function(d) { return x(d.logFC); })
-        .attr("cy", function(d) { return y(d.pValue); })
+        .attr("cy", function(d) { return y(d.logP); })
         .attr("r", 3)
         .style("fill", function(d) { return getColor(d); })
         .on("mouseover", function(d) {
             drawMiniHeatmap(d);
-            var html = "- Log10 p-Value: " + d.pValue + "<br/>" + "Real p-Value:" + (Math.pow(10, - d.pValue)).toFixed(4) + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe;
+            var html = "- Log10 p-Value: " + d.logP + "<br/>" + "Real p-Value:" + d.pValue + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe;
 
             tooltip
             .style("visibility", "visible")

@@ -68,7 +68,8 @@ top.fit = data.frame(
         B=fit$lods[, contr]
 )
 
-pValues <- -log10(top.fit$P.Value)
+pValues <- top.fit$P.Value
+logPs <- -log10(top.fit$P.Value)
 logFCs <- top.fit$logFC
 probes <- HDD.zScore.matrix$PROBE
 geneSymbols <- HDD.zScore.matrix$GENESYMBOL
@@ -76,6 +77,7 @@ geneSymbols <- HDD.zScore.matrix$GENESYMBOL
 output$probes <- probes
 output$geneSymbols <- geneSymbols
 output$pValues <- pValues
+output$logPs <- logPs
 output$logFCs <- logFCs
 output$patientIDs <- patientIDs
 output$zScoreMatrix <- HDD.zScore.matrix
