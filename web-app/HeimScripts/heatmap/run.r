@@ -1,11 +1,3 @@
-# mock data
-# ========
-df  <- data.frame(Row.Label= as.character(1:5) , Bio.marker=as.character(2:6), z=11:15, u=26:30)
-df2 <- data.frame(Row.Label= as.character(1:5) , Bio.marker=as.character(2:6), z=11:15, u=26:30)
-loaded_variables <- list("first one"=df, "second" = df2)
-# mock data
-# ========
-
 library(gplots)
 
 
