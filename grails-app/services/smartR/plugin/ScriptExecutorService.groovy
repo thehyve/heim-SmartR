@@ -139,7 +139,9 @@ class ScriptExecutorService {
         }
 
         def img = connection.parseAndEval("image").asBytes()
-
+        // OutputStream out = new BufferedOutputStream(new FileOutputStream("/Users/sascha.herzinger/test.png"));
+        // out.write(img);
+        // out.close();
         return [json: json, img: img]
     }
 

@@ -32,10 +32,8 @@ class SmartRController {
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
                     model: [results: answer.json]
         } else {
-            response.setHeader('Content-length', answer.img.length.toString())
-            response.contentType = 'image/png'
-            response.outputStream << answer.img
-            response.outputStream.flush()
+            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
+                    model: [image: answer.img]
         }
     }
 
