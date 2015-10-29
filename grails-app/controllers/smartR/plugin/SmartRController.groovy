@@ -25,22 +25,27 @@ class SmartRController {
     */
     def renderOutputDIV = {
         params.init = params.init == null ? true : params.init // defaults to true
-        def (success, results) = smartRService.runScript(params)
+        def (success, answer) = smartRService.runScript(params)
         if (! success) {
-            render results
-        } else {
+            render answer
+        } else if (! answer.img) {
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: results]
+                    model: [results: answer.json]
+        } else {
+            response.setHeader('Content-length', answer.img.length.toString())
+            response.contentType = 'image/png'
+            response.outputStream << answer.img
+            response.outputStream.flush()
         }
     }
 
     def updateOutputDIV = {
         params.init = false
-        def (success, results) = smartRService.runScript(params)
+        def (success, answer) = smartRService.runScript(params)
         if (! success) {
-            render new JsonBuilder([error: results]).toString()
+            render new JsonBuilder([error: answer]).toString()
         } else {
-            render results
+            render answer.json // TODO: return json AND image
         }
     }
 

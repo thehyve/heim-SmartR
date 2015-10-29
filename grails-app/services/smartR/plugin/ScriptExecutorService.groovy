@@ -137,7 +137,10 @@ class ScriptExecutorService {
         """).asString()) {
             json += chunk
         }
-        return json
+
+        def img = connection.parseAndEval("image").asBytes()
+
+        return [json: json, img: img]
     }
 
     def run(parameterMap) {
