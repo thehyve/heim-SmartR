@@ -1,24 +1,13 @@
 package smartR.plugin
 
-import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.json.JSONArray
 import groovy.json.JsonBuilder
 import org.apache.commons.io.FilenameUtils
-
 
 class SmartRController {
 
     def smartRService
+    def eaeService
 
-    /**
-    *   Renders the default view
-    */
-    def index = {
-        def dir = smartRService.getWebAppFolder() + '/Scripts/'
-        def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R' }
-        [scriptList: scriptList]
-    }
 
     /**
     *   Renders the actual visualization based on the chosen script and the results computed
@@ -67,15 +56,10 @@ class SmartRController {
     }
 
     /**
-    *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
-    */
-    def loadScripts = {
-        JSONObject result = new JSONObject()
-        JSONObject script = new JSONObject()
-        script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/smartR/smartR.js" as String)
-        script.put("type", "script")
-        result.put("success", true)
-        result.put("files", new JSONArray() << script)
-        render result as JSON;
-    }
+     *   Go to eTRIKS Analytical Engine
+     */
+    def goToEAEngine = {
+        render template: '/eae/home', model:[ hpcScriptList: eaeService.hpcScriptList] }
+
+
 }

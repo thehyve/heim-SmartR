@@ -15,7 +15,8 @@ grails.project.dependency.resolution = {
         mavenRepo 'https://repo.thehyve.nl/content/repositories/public/'
     }
     dependencies {
-        // compile 'org.apache.ant:ant:1.9.6'
+        compile 'org.mongodb:mongo-java-driver:3.0.4'
+        compile 'org.apache.oozie:oozie-client:4.2.0'
     }
     plugins {
 
