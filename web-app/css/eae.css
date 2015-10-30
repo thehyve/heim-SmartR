@@ -1,0 +1,52 @@
+#eaeinputs {
+    padding: 40px;
+}
+.cachetable {
+    border-collapse: collapse;
+    margin: auto;
+}
+.cachetable th {
+    font-weight: bold;
+    padding: 5px;
+}
+.cachetable td, .cachetable th {
+    border: 1px solid grey;
+}
+.cachetable td {
+    padding: 5px;
+    line-height: 25px;
+}
+.eae_genetag {
+    border: solid 1px #515BA2;
+    padding: 4px;
+    line-height: 10px;
+    margin-right: 5px;
+    background-color: #dde7ff;
+    border-radius: 3px;
+    display: inline-block;
+    text-wrap: normal;
+    white-space: normal;
+    font-size: 10px;
+}
+.eae_genetag:hover {
+    color: #255b17;
+    border-color: #255b17;
+    background-color: #d0ffd4;
+    cursor: pointer;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: rgb(128, 128, 128);
+    shape-rendering: crispEdges;
+}
+
+#cvPerformanceGraph .points circle {
+    fill: rgb(128, 193, 119);
+    stroke: rgb(84, 151, 12);
+}
+
+#addPE {
+    padding: 4px;
+}
