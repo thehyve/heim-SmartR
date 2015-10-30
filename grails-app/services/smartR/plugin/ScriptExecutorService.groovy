@@ -110,7 +110,8 @@ class ScriptExecutorService {
         connection.voidEval("""
             require(jsonlite)
             settings <- fromJSON(settings)
-            output <- list()
+            SmartR.output <- list()
+            SmartR.plot <- NULL
         """)
     }
 
@@ -123,7 +124,7 @@ class ScriptExecutorService {
     def computeResults(connection) {
         def R_CHUNK_SIZE = 10 * 1024 * 1024 // should be the size for a string of about 10MB
         connection.voidEval("""
-            json <- toString(toJSON(output, digits=5))
+            json <- toString(toJSON(SmartR.output, digits=5))
             start <- 1
             stop <- ${R_CHUNK_SIZE}
         """)
@@ -138,10 +139,19 @@ class ScriptExecutorService {
             json += chunk
         }
 
-        def img = connection.parseAndEval("image").asBytes()
-        // OutputStream out = new BufferedOutputStream(new FileOutputStream("/Users/sascha.herzinger/test.png"));
-        // out.write(img);
-        // out.close();
+        def img = []
+        try { 
+            img = connection.eval("""
+                tmp <- tempfile()
+                png(tmp)
+                print(SmartR.plot)
+                dev.off()
+                image <- readBin(tmp, 'raw', file.info(tmp)[['size']])
+                unlink(tmp)
+                image
+            """).asBytes()
+        } catch (all) { }
+
         return [json: json, img: img]
     }
 

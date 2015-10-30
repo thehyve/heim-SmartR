@@ -28,12 +28,9 @@ class SmartRController {
         def (success, answer) = smartRService.runScript(params)
         if (! success) {
             render answer
-        } else if (! answer.img) {
-            render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: answer.json]
         } else {
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [image: answer.img]
+                    model: [results: answer.json, image: answer.img.toString()]
         }
     }
 

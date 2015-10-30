@@ -64,14 +64,14 @@ regLineYIntercept <- mean(yArr) - regLineSlope * mean(xArr)
 
 ### WRITE OUTPUT ###
 
-output$correlation <- corTest$estimate
-output$pvalue <- corTest$p.value
-output$regLineSlope <- regLineSlope
-output$regLineYIntercept <- regLineYIntercept
-output$method <- settings$method
-output$xArrLabel <- concepts[1]
-output$yArrLabel <- concepts[2]
-output$xArr <- xArr
-output$yArr <- yArr
-output$patientIDs <- patientIDs
-output$tags <- tags
+SmartR.output$correlation <- corTest$estimate
+SmartR.output$pvalue <- corTest$p.value
+SmartR.output$regLineSlope <- regLineSlope
+SmartR.output$regLineYIntercept <- regLineYIntercept
+SmartR.output$method <- settings$method
+SmartR.output$xArrLabel <- concepts[1]
+SmartR.output$yArrLabel <- concepts[2]
+SmartR.output$xArr <- xArr
+SmartR.output$yArr <- yArr
+SmartR.output$patientIDs <- patientIDs
+SmartR.output$tags <- tags

@@ -244,45 +244,45 @@ for (folder in unique.folders) {
 
 ### WRITE OUTPUT ###
 
-output$extraFields <- extraFields
-output$features <- features
-output$fields <- fields
-output$significanceValues <- significanceValues.sorted
-output$patientIDs <- patientIDs
-output$probes <- probes
-output$geneSymbols <- geneSymbols
+SmartR.output$extraFields <- extraFields
+SmartR.output$features <- features
+SmartR.output$fields <- fields
+SmartR.output$significanceValues <- significanceValues.sorted
+SmartR.output$patientIDs <- patientIDs
+SmartR.output$probes <- probes
+SmartR.output$geneSymbols <- geneSymbols
 
-output$hclustEuclideanComplete <- list(
+SmartR.output$hclustEuclideanComplete <- list(
     order.dendrogram(colDendrogramEuclideanComplete) - 1,
     order.dendrogram(rowDendrogramEuclideanComplete) - 1,
     dendrogramToJSON(colDendrogramEuclideanComplete),
     dendrogramToJSON(rowDendrogramEuclideanComplete))
 
-output$hclustEuclideanSingle <- list(
+SmartR.output$hclustEuclideanSingle <- list(
     order.dendrogram(colDendrogramEuclideanSingle) - 1,
     order.dendrogram(rowDendrogramEuclideanSingle) - 1,
     dendrogramToJSON(colDendrogramEuclideanSingle),
     dendrogramToJSON(rowDendrogramEuclideanSingle))
 
-output$hclustEuclideanAverage <- list(
+SmartR.output$hclustEuclideanAverage <- list(
     order.dendrogram(colDendrogramEuclideanAverage) - 1,
     order.dendrogram(rowDendrogramEuclideanAverage) - 1,
     dendrogramToJSON(colDendrogramEuclideanAverage),
     dendrogramToJSON(rowDendrogramEuclideanAverage))
 
-output$hclustManhattanComplete <- list(
+SmartR.output$hclustManhattanComplete <- list(
     order.dendrogram(colDendrogramManhattanComplete) - 1,
     order.dendrogram(rowDendrogramManhattanComplete) - 1,
     dendrogramToJSON(colDendrogramManhattanComplete),
     dendrogramToJSON(rowDendrogramManhattanComplete))
 
-output$hclustManhattanSingle <- list(
+SmartR.output$hclustManhattanSingle <- list(
     order.dendrogram(colDendrogramManhattanSingle) - 1,
     order.dendrogram(rowDendrogramManhattanSingle) - 1,
     dendrogramToJSON(colDendrogramManhattanSingle),
     dendrogramToJSON(rowDendrogramManhattanSingle))
 
-output$hclustManhattanAverage <- list(
+SmartR.output$hclustManhattanAverage <- list(
     order.dendrogram(colDendrogramManhattanAverage) - 1,
     order.dendrogram(rowDendrogramManhattanAverage) - 1,
     dendrogramToJSON(colDendrogramManhattanAverage),

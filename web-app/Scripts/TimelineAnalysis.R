@@ -131,9 +131,9 @@ if (! is.null(similarityMeasure) && ! is.null(linkageMeasure)) {
 
 ### WRITE OUTPUT ###
 
-output$data <- points
-output$concepts <- uniq.concepts
-output$patientIDs <- uniq.patientIDs
-output$timepoints <- uniq.timepoints
-output$acfEstimates <- acfEstimates
-output$clusterings <- clusterings
+SmartR.output$data <- points
+SmartR.output$concepts <- uniq.concepts
+SmartR.output$patientIDs <- uniq.patientIDs
+SmartR.output$timepoints <- uniq.timepoints
+SmartR.output$acfEstimates <- acfEstimates
+SmartR.output$clusterings <- clusterings

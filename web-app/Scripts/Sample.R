@@ -5,7 +5,7 @@
 #
 # settings # a list containing all settings you specified in the input view
 #
-# output # This empty list must contain all data you want in your visualization once this script has finished
+# SmartR.output # This empty list must contain all data you want in your visualization once this script has finished
 
 
 #### EXAMPLE ####
@@ -24,7 +24,7 @@ if (doStuff) {
 	abc <- foobar(data)
 }
 
-# don't bother where output comes from or where it goes
+# don't bother where SmartR.output comes from or where it goes
 # Just put everything what you need in your visualization in it
-output$data <- data
-output$foobarResults <- abc
+SmartR.output$data <- data
+SmartR.output$foobarResults <- abc
