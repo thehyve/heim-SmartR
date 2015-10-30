@@ -728,6 +728,18 @@ function setImage(divName, image) {
     document.getElementById(divName).appendChild(img);
 }
 
+function goToEAE() {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/goToEAEngine' ,
+        type: "POST",
+        timeout: '600000'
+    }).done(function(serverAnswer) {
+        jQuery("#index").html(serverAnswer);
+    }).fail(function() {
+        jQuery("#index").html("AJAX CALL FAILED!");
+    });
+}
+
 /**
 *   Initial method for the whole process of computing a visualization
 */
