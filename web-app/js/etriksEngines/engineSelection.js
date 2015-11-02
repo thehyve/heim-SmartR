@@ -3,7 +3,7 @@
 // Panel item for the SmartR plugin
 var etriksPanel = new Ext.Panel({
     id: 'etrikspanel',
-    title: 'eTRIKS',
+    title: 'eTRIKS Analytics(SmartR & EAE)',
     region: 'center',
     split: true,
     height: 90,

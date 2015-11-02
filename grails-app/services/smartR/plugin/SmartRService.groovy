@@ -17,9 +17,7 @@ class SmartRService {
     def dataQueryService
     def scriptExecutorService
 
-	/**
-     *   Renders the list for smartR default view
-     */
+
     def getScriptList() {
         def dir = getWebAppFolder() + '/Scripts/smartR/'
         def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R'}
@@ -107,7 +105,7 @@ class SmartRService {
         def parameterMap = [:]
         parameterMap['init'] = params.init.toBoolean()
         parameterMap['script'] = params.script
-        parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/'
+        parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/smartR/'
         parameterMap['result_instance_id1'] = params.result_instance_id1
         parameterMap['result_instance_id2'] = params.result_instance_id2
         parameterMap['settings'] = params.settings

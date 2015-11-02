@@ -102,8 +102,8 @@ class ScriptExecutorService {
 
         connection.voidEval("""
             require(jsonlite)
-            data.cohort1 <- fromJSON(data_cohort1)
-            data.cohort2 <- fromJSON(data_cohort2)
+            SmartR.data.cohort1 <- fromJSON(data_cohort1)
+            SmartR.data.cohort2 <- fromJSON(data_cohort2)
         """)
     }
 
@@ -111,9 +111,10 @@ class ScriptExecutorService {
         connection.assign("settings", parameterMap['settings'].toString())
         connection.voidEval("""
             require(jsonlite)
-            settings <- fromJSON(settings)
+            tmp <- '/tmp/tmp.png'
+            png(tmp, width=1000, height=1000)
+            SmartR.settings <- fromJSON(settings)
             SmartR.output <- list()
-            SmartR.plot <- NULL
         """)
     }
 
@@ -144,9 +145,6 @@ class ScriptExecutorService {
         def img = []
         try { 
             img = connection.eval("""
-                tmp <- tempfile()
-                png(tmp)
-                print(SmartR.plot)
                 dev.off()
                 image <- readBin(tmp, 'raw', file.info(tmp)[['size']])
                 unlink(tmp)

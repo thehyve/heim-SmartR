@@ -1,11 +1,11 @@
 ### PREPARE SETTINGS ###
 
-method <- settings$method
-if (! is.null(settings$xLow)) {
-	xLow <- as.integer(settings$xLow)
-	xHigh <- as.integer(settings$xHigh)
-	yLow <- as.integer(settings$yLow)
-	yHigh <- as.integer(settings$yHigh)
+method <- SmartR.settings$method
+if (! is.null(SmartR.settings$xLow)) {
+	xLow <- as.integer(SmartR.settings$xLow)
+	xHigh <- as.integer(SmartR.settings$xHigh)
+	yLow <- as.integer(SmartR.settings$yLow)
+	yHigh <- as.integer(SmartR.settings$yHigh)
 } else {
 	xLow <- -Inf
 	xHigh <- Inf
@@ -15,7 +15,7 @@ if (! is.null(settings$xLow)) {
 
 ### COMPUTE RESULTS ###
 
-points <- data.cohort1$datapoints
+points <- SmartR.data.cohort1$datapoints
 concepts <- unique(points$concept)
 if (! length(points)) {
 	stop('Your selection does not match any patient in the defined cohort!')
@@ -46,7 +46,7 @@ xArr <- xArr[selection]
 yArr <- yArr[selection]
 patientIDs <- patientIDs[selection]
 
-annotations <- data.cohort1$annotations
+annotations <- SmartR.data.cohort1$annotations
 tags <- list()
 if (length(annotations) > 0) {
 	annotations <- annotations[annotations$patientID %in% patientIDs, ]

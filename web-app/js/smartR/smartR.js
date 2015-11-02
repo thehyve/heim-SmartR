@@ -386,7 +386,7 @@ function createD3Slider(args) {
 */
 function mouseX() {
     var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
-    return mouseXPos - jQuery('#smartRPanel').offset().left + jQuery('#outputDIV').parent().scrollLeft();
+    return mouseXPos - jQuery('#etrikspanel').offset().left + jQuery('#outputDIV').parent().scrollLeft();
 }
 
 /**
@@ -396,7 +396,7 @@ function mouseX() {
 */
 function mouseY() {
     var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
-    return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#smartRPanel').offset().top;
+    return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#etrikspanel').offset().top;
 }
 
 /**

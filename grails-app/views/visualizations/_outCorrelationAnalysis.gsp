@@ -138,12 +138,12 @@
     }
 
     var controls = d3.select('#controls').append('svg')
-    .attr('width', jQuery("#smartRPanel").width())
+    .attr('width', jQuery("#etrikspanel").width())
     .attr('height', 45);
 
     var margin = {top: 20, right: 40, bottom: 5, left: 10};
-    var width = jQuery("#smartRPanel").width() / 2 - 10 - margin.left - margin.right;
-    var height = jQuery("#smartRPanel").height() / 2 - 10 - margin.top - margin.bottom;
+    var width = jQuery("#etrikspanel").width() / 2 - 10 - margin.left - margin.right;
+    var height = jQuery("#etrikspanel").height() / 2 - 10 - margin.top - margin.bottom;
 
     var results = ${results};
     var xLabel = results.xArrLabel;
