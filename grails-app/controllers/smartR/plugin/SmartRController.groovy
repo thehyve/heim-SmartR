@@ -18,7 +18,6 @@ class SmartRController {
         if (! success) {
             render answer
         } else {
-            print answer.json
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
                     model: [results: answer.json, image: answer.img.toString()]
         }

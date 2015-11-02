@@ -68,7 +68,7 @@ SmartR.output$correlation <- corTest$estimate
 SmartR.output$pvalue <- corTest$p.value
 SmartR.output$regLineSlope <- regLineSlope
 SmartR.output$regLineYIntercept <- regLineYIntercept
-SmartR.output$method <- settings$method
+SmartR.output$method <- SmartR.settings$method
 SmartR.output$xArrLabel <- concepts[1]
 SmartR.output$yArrLabel <- concepts[2]
 SmartR.output$xArr <- xArr

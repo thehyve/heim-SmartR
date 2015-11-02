@@ -13,8 +13,8 @@
 
 <body>
     <div id="index" style="text-align: center">
-        <h1 class="txt"> eTRIKS analytical engine (EAE).</h1>
-        <span style='color:#0200ff' class='txt'>Please select which eTRIKS engine you want.</span><br/>
+        <h1 class="txt"> Welcome to eTRIKS Analytics!</h1>
+        <span style='color:#0200ff' class='txt'>Please select which engine you want to use.</span><br/>
         <hr class="myhr"/>
         <g:select
             name="engineSelect"

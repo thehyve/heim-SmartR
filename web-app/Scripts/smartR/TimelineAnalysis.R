@@ -1,14 +1,14 @@
 ### PREPARE SETTINGS ###
 
-acfPatientID <- settings$acfPatientID
-xAxisSortOrder <- as.vector(settings$xAxisSortOrder)
-similarityMeasure <- settings$similarityMeasure
-linkageMeasure <- settings$linkageMeasure
-interpolateNAs <- strtoi(settings$interpolateNAs)
+acfPatientID <- SmartR.settings$acfPatientID
+xAxisSortOrder <- as.vector(SmartR.settings$xAxisSortOrder)
+similarityMeasure <- SmartR.settings$similarityMeasure
+linkageMeasure <- SmartR.settings$linkageMeasure
+interpolateNAs <- strtoi(SmartR.settings$interpolateNAs)
 
 ### COMPUTE RESULTS ###
 
-points <- data.cohort1$datapoints
+points <- SmartR.data.cohort1$datapoints
 
 if (length(points$patientID) == 0) {
 	stop('Your selection does not match any patient in the defined cohort!')
