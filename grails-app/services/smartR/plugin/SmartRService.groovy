@@ -19,7 +19,7 @@ class SmartRService {
 
 
     def getScriptList() {
-        def dir = getWebAppFolder() + '/Scripts/smartR/'
+        def dir = getWebAppFolder() + 'Scripts/smartR/'
         def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R'}
         return scriptList
     }

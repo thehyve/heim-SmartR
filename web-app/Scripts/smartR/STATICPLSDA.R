@@ -22,6 +22,6 @@ tmp.data <- df[, 2:(length(concepts)+1)]
 tmp.group <- as.factor(df$concept)
 tmp.y <- matrix(as.numeric(tmp.group),ncol=1)
 
-mods<-make.OSC.PLS.model(tmp.y, pls.data=tmp.data, comp=2, OSC.comp=1, validation = "LOO",method="oscorespls", cv.scale=TRUE, progress=FALSE)
+mods <- make.OSC.PLS.model(tmp.y, pls.data=tmp.data, comp=2, OSC.comp=1, validation = "LOO",method="oscorespls", cv.scale=TRUE, progress=FALSE)
 
 plot.OSC.results(mods,plot="scores",groups=tmp.group)

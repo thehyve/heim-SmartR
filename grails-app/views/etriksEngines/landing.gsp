@@ -2,6 +2,33 @@
     .txt {
         font-family: 'Roboto', sans-serif;
     }
+
+    #wrapper {
+        width: 0%;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    #smartRDIV {
+        float: left;
+        background-color: #123456;
+        color: #FFFFFF;
+        width: 100px;
+        height: 50px;
+        text-align: center;
+        font-size: 20px;
+        vertical-align: middle;
+    }
+
+    #eAEDIV {
+        float: left;
+        background-color: #654321;
+        color: #FFFFFF;
+        width: 100px;
+        height: 50px;
+        text-align: center;
+        vertical-align: middle;
+    }
 </style>
 
 <head>
@@ -24,6 +51,9 @@
             onchange="gotToEngineDIV()"/>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     </div>
+    <!-- <div id="wrapper">
+        <div id="smartRDIV">SmartR</div> <div id="eAEDIV">eAE</div>
+    </div> -->
 
     <div id="outputDIV" class='txt'></div>
 </body>

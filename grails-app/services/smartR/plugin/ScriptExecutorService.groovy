@@ -146,7 +146,9 @@ class ScriptExecutorService {
         try { 
             img = connection.eval("""
                 dev.off()
-                image <- readBin(tmp, 'raw', file.info(tmp)[['size']])
+                if (file.exists(tmp)) {
+                    image <- readBin(tmp, 'raw', file.info(tmp)[['size']])    
+                }
                 unlink(tmp)
                 image
             """).asBytes()

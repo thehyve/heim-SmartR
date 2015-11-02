@@ -8,7 +8,6 @@ class SmartRController {
     def smartRService
     def eaeService
 
-
     /**
     *   Renders the actual visualization based on the chosen script and the results computed
     */
