@@ -1,5 +1,6 @@
 categories <- SmartR.data.cohort1$categoricalVars
-concepts <- sapply(strsplit(categories$concept, '\\\\'), function(split) { paste(tail(split, n=2), collapse='/') })
+categories$concept <- sapply(strsplit(categories$concept, '\\\\'), function(split) { paste(tail(split, n=2), collapse='/') })
+concepts <- categories$concept
 uniq.concepts <- unique(concepts)
 slices <- c() 
 for (concept in uniq.concepts) {

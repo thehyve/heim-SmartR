@@ -1,6 +1,6 @@
 Numerical variables go here.<br/>
-<div id='numericVars' class="queryGroupIncludeSmall"></div>
-<input type="button" class='txt' onclick="clearVarSelection('numericVars')" value="Clear Window"><br/>
+<div id='numericalVars' class="queryGroupIncludeSmall"></div>
+<input type="button" class='txt' onclick="clearVarSelection('numericalVars')" value="Clear Window"><br/>
 <br/>
 Choose a method for the correlation analysis.<br/>
 <select id="methodSelect" class='txt'>
@@ -10,10 +10,10 @@ Choose a method for the correlation analysis.<br/>
 </select><br/>
 
 <script>
-	activateDragAndDrop('numericVars');
+	activateDragAndDrop('numericalVars');
 
 	function register() {
-		registerConceptBox('numericVars', [1], 'valueicon', 2, undefined);
+		registerConceptBox('numericalVars', [1], 'valueicon', 2, undefined);
 	}
 
 	function getSettings() {

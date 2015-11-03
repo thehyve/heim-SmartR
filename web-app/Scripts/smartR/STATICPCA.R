@@ -14,7 +14,9 @@ if (! suppressMessages(require(ggbiplot))) {
 }
 
 data <- SmartR.data.cohort1$numericalVars
+data$concept <- sapply(strsplit(data$concept, '\\\\'), function(split) { paste(tail(split, n=2), collapse='/') })
 categories <- SmartR.data.cohort1$categoricalVars
+categories$concept <- sapply(strsplit(categories$concept, '\\\\'), function(split) { paste(tail(split, n=2), collapse='/') })
 concepts <- unique(data$concept)
 df <- cast(data, patientID~concept)
 df <- merge(df, categories, by='patientID')
