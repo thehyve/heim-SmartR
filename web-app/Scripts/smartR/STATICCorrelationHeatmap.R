@@ -18,6 +18,6 @@ heatmap.2(df,
 		density.info="none", 
 		trace="none", 
 		scale="row",
-		cexRow=1,
-		cexCol=1,
+		cexRow=1.5,
+		cexCol=1.5,
 		margins=c(40,40))

@@ -26,11 +26,11 @@ ir <- df[, 2:(length(concepts)+1)]
 ir.species <- as.factor(df$concept)
 ir.pca <- prcomp(ir, center = TRUE, scale. = TRUE)
 
-
 g <- ggbiplot(ir.pca, obs.scale = 1, var.scale = 1, 
               groups = ir.species, ellipse = TRUE, 
-              circle = TRUE)
+              circle = TRUE, varname.size=5, varname.adjust=1.1, labels.size = 5)
+g <- g + geom_point(aes(colour=ir.species), size = 3)
 g <- g + scale_color_discrete(name = '')
-g <- g + theme(legend.direction = 'horizontal', 
-               legend.position = 'top')
+g <- g + theme(legend.direction = 'vertical', 
+               legend.position = 'right')
 print(g)

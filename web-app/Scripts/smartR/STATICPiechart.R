@@ -9,5 +9,4 @@ for (concept in uniq.concepts) {
 pct <- round(slices/sum(slices)*100)
 lbls <- paste(uniq.concepts, pct) # add percents to labels 
 lbls <- paste(lbls,"%",sep="") # ad % to labels 
-pie(slices,labels = concepts, col=rainbow(length(lbls)),
-  	main="Pie Chart of Countries")
+pie(slices,labels = lbls, col=rainbow(length(lbls)), radius = 0.5)
