@@ -35,8 +35,8 @@ getZScoreMatrix <- function(valueMatrix) {
     zScoreMatrix
 }
 
-HDD.value.matrix.cohort1 <- getHDDMatrix(data.cohort1$mRNAData)
-HDD.value.matrix.cohort2 <- getHDDMatrix(data.cohort2$mRNAData)
+HDD.value.matrix.cohort1 <- getHDDMatrix(SmartR.data.cohort1$mRNAData)
+HDD.value.matrix.cohort2 <- getHDDMatrix(SmartR.data.cohort2$mRNAData)
 
 HDD.value.matrix.cohort1 <- HDD.value.matrix.cohort1[HDD.value.matrix.cohort1$PROBE %in% HDD.value.matrix.cohort2$PROBE, ]
 HDD.value.matrix.cohort2 <- HDD.value.matrix.cohort2[HDD.value.matrix.cohort2$PROBE %in% HDD.value.matrix.cohort1$PROBE, ]
@@ -74,10 +74,10 @@ logFCs <- top.fit$logFC
 probes <- HDD.zScore.matrix$PROBE
 geneSymbols <- HDD.zScore.matrix$GENESYMBOL
 
-output$probes <- probes
-output$geneSymbols <- geneSymbols
-output$pValues <- pValues
-output$logPs <- logPs
-output$logFCs <- logFCs
-output$patientIDs <- patientIDs
-output$zScoreMatrix <- HDD.zScore.matrix
+SmartR.output$probes <- probes
+SmartR.output$geneSymbols <- geneSymbols
+SmartR.output$pValues <- pValues
+SmartR.output$logPs <- logPs
+SmartR.output$logFCs <- logFCs
+SmartR.output$patientIDs <- patientIDs
+SmartR.output$zScoreMatrix <- HDD.zScore.matrix

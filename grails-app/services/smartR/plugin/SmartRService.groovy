@@ -97,7 +97,7 @@ class SmartRService {
             return grailsApplication
                 .mainContext
                 .servletContext
-                .getRealPath('/plugins/') + '/smart-r-0.2/'
+                .getRealPath('/plugins/') + '/smart-r-0.3/'
         }
     }
 
@@ -106,8 +106,8 @@ class SmartRService {
         parameterMap['init'] = params.init.toBoolean()
         parameterMap['script'] = params.script
         parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/smartR/'
-        parameterMap['result_instance_id1'] = params.result_instance_id1
-        parameterMap['result_instance_id2'] = params.result_instance_id2
+        parameterMap['result_instance_id1'] = params.int('result_instance_id1')
+        parameterMap['result_instance_id2'] = params.int('result_instance_id2')
         parameterMap['settings'] = params.settings
         parameterMap['conceptBoxes'] = new JsonSlurper().parseText(params.conceptBoxes)
         parameterMap['cookieID'] = params.cookieID
@@ -122,6 +122,6 @@ class SmartRService {
             parameterMap = queryData(parameterMap)
         }
 
-        return scriptExecutorService.run(parameterMap)
+        scriptExecutorService.run(parameterMap)
     }
 }
