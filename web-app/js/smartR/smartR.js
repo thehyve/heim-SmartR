@@ -518,7 +518,7 @@ function setCohorts(constrains, andConcat, negate, reCompute, subset) {
         appendItemFromConceptInto(destination, constrains[i], negate);
     }
     if (reCompute) {
-        runAllQueries(computeResults);
+        runAllQueries(runAnalysis);
     }
 }
 
@@ -732,8 +732,8 @@ function goToEAE() {
         url: pageInfo.basePath + '/SmartR/goToEAEngine' ,
         type: "POST",
         timeout: '600000'
-    }).done(function(serverAnswer) {
-        jQuery("#index").html(serverAnswer);
+    }).done(function(response) {
+        jQuery("#index").html(response);
     }).fail(function() {
         jQuery("#index").html("AJAX CALL FAILED!");
     });
@@ -748,13 +748,13 @@ function renderResultsInTemplate(callback, data) {
         type: "POST",
         timeout: 1.8e+6,
         data: data
-    }).done(function(serverAnswer) {
-        if (serverAnswer === 'RUNNING') {
+    }).done(function(response) {
+        if (response === 'RUNNING') {
             setTimeout(renderResultsInTemplate(callback, data), 5000);
         } else {
             jQuery('#submitButton').prop('disabled', false);
             callback();
-            jQuery("#outputDIV").html(serverAnswer);
+            jQuery("#outputDIV").html(response);
         }
     }).fail(function() {
         jQuery('#submitButton').prop('disabled', false);
@@ -769,18 +769,15 @@ function renderResults(callback, data) {
         type: "POST",
         timeout: 1.8e+6,
         data: data
-    }).done(function(serverAnswer) {
-        serverAnswer = JSON.parse(serverAnswer);
-        if (serverAnswer.error) {
-            if (serverAnswer.error === 'RUNNING') {
-                setTimeout(renderResults(callback, data), 5000);
-            } else {
-                jQuery('#submitButton').prop('disabled', false);
-                alert(serverAnswer.error);
-            }
+    }).done(function(response) {
+        if (response === 'RUNNING') {
+            setTimeout(renderResults(callback, data), 5000);
+        } else if (JSON.parse(response).error) {
+            jQuery('#submitButton').prop('disabled', false);
+            alert(response.error);
         } else {
             jQuery('#submitButton').prop('disabled', false);
-            callback(serverAnswer);
+            callback(JSON.parse(response));
         }
     }).fail(function() {
         jQuery('#submitButton').prop('disabled', false);
@@ -788,23 +785,46 @@ function renderResults(callback, data) {
     });
 }
 
-function updateStatistics(callback, data, redraw) {
+function computeResults(callback, data, init, redraw) {
+    callback = callback === undefined ? function() {} : callback;
+    data = data === undefined ? prepareFormData() : data;
+    init = init === undefined ? true : init;
+    redraw = redraw === undefined ? true : redraw;
+
+    var retCodes = {
+        1: 'An unexpected error occured while initializing environment.',
+        2: 'An unexpected error occured while accessing the database.', 
+        3: 'An unexpected error occured while processing the data.'
+    };
+
     jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/reComputeResults',
+        url: pageInfo.basePath + '/SmartR/' + (init ? 'computeResults' : 'reComputeResults'),
         type: "POST",
         timeout: 1.8e+6,
         data: data
-    }).always(function() {
+    }).done(function(response) {
+        if (response === '0') { // successful
+            if (redraw) {
+                renderResultsInTemplate(callback, data);
+            } else {
+                renderResults(callback, data);
+            }
+        } else { // expected error
+            jQuery("#outputDIV").html('');
+            alert(retCodes[response]);
+        }
+    }).fail(function(_, __, error){
+        // FIXME: Do this only for network timeouts, not for all unexpected errors
         if (redraw) {
             renderResultsInTemplate(callback, data);
         } else {
-           renderResults(callback, data); 
+            renderResults(callback, data);
         }
     });
 }
 
-function computeResults() {
+function runAnalysis() {
     conceptBoxes = [];
     sanityCheckErrors = [];
     register(); // method MUST be implemented by _inFoobarAnalysis.gsp
@@ -815,30 +835,21 @@ function computeResults() {
 
     // if no subset IDs exist compute them
     if(!(isSubsetEmpty(1) || GLOBAL.CurrentSubsetIDs[1]) || !( isSubsetEmpty(2) || GLOBAL.CurrentSubsetIDs[2])) {
-        runAllQueries(computeResults);
+        runAllQueries(runAnalysis);
         return false;
     }
 
-    jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
         type: "POST",
         timeout: 1.8e+6
-    }).done(function(serverAnswer) {
-        jQuery("#outputDIV").html(serverAnswer);
+    }).done(function(response) {
+        jQuery("#outputDIV").html(response);
     }).fail(function() {
         jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
     });
 
-    var data = prepareFormData();
-    jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/computeResults',
-        type: "POST",
-        timeout: 1.8e+6,
-        data: data
-    }).always(function() {
-        renderResultsInTemplate(function() {}, data);
-    });
+    computeResults();
 }
 
 /**
@@ -851,8 +862,8 @@ function changeInputDIV() {
         type: "POST",
         timeout: 1.8e+6,
         data: {'script': jQuery('#scriptSelect').val()}
-    }).done(function(serverAnswer) {
-        jQuery("#inputDIV").html(serverAnswer);
+    }).done(function(response) {
+        jQuery("#inputDIV").html(response);
     }).fail(function() {
         jQuery("#inputDIV").html("Coult not render input form. Probably you lost network connection.");
     });

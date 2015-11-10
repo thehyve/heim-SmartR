@@ -1096,12 +1096,12 @@
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
 
-        var doOnResponse = function() {
+        var onResponse = function() {
             loadFeatureButton.select('text').text('Load 100 additional rows');
             cuttoffButton.select('text').text('Apply Cutoff');
         };
 
-        updateStatistics(doOnResponse, data, true);
+        computeResults(onResponse, data, false, true);
     }
 
     function init() {

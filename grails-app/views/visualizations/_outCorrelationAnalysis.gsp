@@ -542,13 +542,13 @@
         data = addSettingsToData(data, { yLow: yLowHigh[0] });
         data = addSettingsToData(data, { yHigh: yLowHigh[1] });
 
-        var doOnResponse = function(reponse) {
+        var onResponse = function(reponse) {
             results = reponse;
             updateRegressionLine();
             updateLegend();
         };
 
-        updateStatistics(doOnResponse, data, false);
+        computeResults(onResponse, data, false, false);
     }
 
     function updateCohorts() {

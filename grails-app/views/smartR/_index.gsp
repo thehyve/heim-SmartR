@@ -33,7 +33,7 @@
         <hr class="myhr"/>
         <g:select name="scriptSelect" class='txt' from="${scriptList}" noSelection="['':'Choose an algorithm']" onchange="changeInputDIV()"/>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="computeResults()"/>
+        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runAnalysis()"/>
         <hr class="myhr"/>
     </div>
 

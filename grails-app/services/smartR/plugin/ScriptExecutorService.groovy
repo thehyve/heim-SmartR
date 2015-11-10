@@ -155,7 +155,6 @@ class ScriptExecutorService {
         if (! connection) {
             sessions[id].success = false
             sessions[id].results = 'Rserve refused the connection! Is it running?'
-            print sessions
             return
         }
 

@@ -116,12 +116,31 @@ class SmartRService {
     }
 
     def runScript(params) {
-        def parameterMap = createParameterMap(params)
+        def parameterMap
 
-        if (parameterMap['init']) {
-            parameterMap = queryData(parameterMap)
+        try {
+            parameterMap = createParameterMap(params)
+        } catch (e) {
+            print e
+            return 1
         }
 
-        scriptExecutorService.run(parameterMap)
+        try {
+            if (parameterMap['init']) {
+                parameterMap = queryData(parameterMap)
+            }
+        } catch (e) {
+            print e
+            return 2
+        }
+        
+        try {
+            scriptExecutorService.run(parameterMap)        
+        } catch(e) {
+            print e
+            return 3
+        }
+
+        return 0
     }
 }

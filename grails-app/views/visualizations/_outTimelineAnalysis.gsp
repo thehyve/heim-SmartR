@@ -1120,7 +1120,7 @@
         data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
         clusteringDropdown.select('.buttonText').text('Loading...');
 
-        var doOnResponse = function(reponse) {
+        var onResponse = function(reponse) {
             clusteringDropdown.select('.buttonText').text('Timeline Clustering');
             for (var i = 0; i < concepts.length; i++) {
                 var concept = concepts[i];
@@ -1132,7 +1132,7 @@
             }
         };
 
-        updateStatistics(doOnResponse, data, false);
+        computeResults(onResponse, data, false, false);
     }
 
     var buttonWidth = 200;

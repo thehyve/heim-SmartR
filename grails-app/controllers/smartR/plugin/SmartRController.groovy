@@ -11,8 +11,8 @@ class SmartRController {
 
     def computeResults = {
         params.init = params.init == null ? true : params.init // defaults to true
-        smartRService.runScript(params)
-        render ''
+        def retCode = smartRService.runScript(params)
+        render retCode.toString()
     }
 
     def reComputeResults = {
@@ -25,22 +25,24 @@ class SmartRController {
     // For handling results yourself
     def renderResults = {
         params.init = false
-        def (success, answer) = scriptExecutorService.getResults(params.cookieID)
-        if (! success) {
-            render new JsonBuilder([error: answer]).toString()
+        def (success, results) = scriptExecutorService.getResults(params.cookieID)
+        if (! success && results == 'RUNNING') {
+            render results
+        } else if (! success) {
+            render new JsonBuilder([error: results]).toString()
         } else {
-            render answer.json // TODO: return json AND image
+            render results.json // TODO: return json AND image
         }
     }
 
     // For (re)drawing the whole visualization
     def renderResultsInTemplate = {
-        def (success, answer) = scriptExecutorService.getResults(params.cookieID)
+        def (success, results) = scriptExecutorService.getResults(params.cookieID)
         if (! success) {
-            render answer
+            render results
         } else {
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: answer.json, image: answer.img.toString()]
+                    model: [results: results.json, image: results.img.toString()]
         }       
     }
     

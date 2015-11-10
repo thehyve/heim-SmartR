@@ -337,12 +337,12 @@
         data = addSettingsToData(data, { excludedPatientIDs: excludedPatientIDs });
 
 
-        var doOnResponse = function(response) {
+        var onResponse = function(response) {
             results = response;
             init();
         };
 
-        updateStatistics(doOnResponse, data, false);
+        computeResults(onResponse, data, false, false);
     }
 
     function removeOutliers() {
