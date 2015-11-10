@@ -4,12 +4,14 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import grails.util.Holders
 import grails.util.Environment
+import groovy.io.FileType
 
 
 class SmartRService {
 
     def DEBUG = Environment.current == Environment.DEVELOPMENT
     def DEBUG_TMP_DIR = '/tmp/'
+    def ENABLE_STATIC_WORKFLOWS = false
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
@@ -20,7 +22,20 @@ class SmartRService {
 
     def getScriptList() {
         def dir = getWebAppFolder() + 'Scripts/smartR/'
-        def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R'}
+        def excludedWorkflows = []
+        if (ENABLE_STATIC_WORKFLOWS) {
+            excludedWorkflows = ['Sample.R']
+        } else {
+            excludedWorkflows = ['Sample.R', 'STATIC']
+        }
+        def scriptList = []
+        new File(dir).eachFile FileType.FILES, { 
+            if (it.name != 'Sample.R' 
+                    && it.name[0] != '.'
+                    && (ENABLE_STATIC_WORKFLOWS || ! it.name.contains('STATIC'))) {
+                scriptList << it.name
+            }
+        }
         return scriptList
     }
 

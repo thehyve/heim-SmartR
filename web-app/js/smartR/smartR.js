@@ -739,9 +739,6 @@ function goToEAE() {
     });
 }
 
-/**
-*   Initial method for the whole process of computing a visualization
-*/
 function renderResultsInTemplate(callback, data) {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderResultsInTemplate',
