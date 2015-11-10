@@ -22,12 +22,6 @@ class SmartRService {
 
     def getScriptList() {
         def dir = getWebAppFolder() + 'Scripts/smartR/'
-        def excludedWorkflows = []
-        if (ENABLE_STATIC_WORKFLOWS) {
-            excludedWorkflows = ['Sample.R']
-        } else {
-            excludedWorkflows = ['Sample.R', 'STATIC']
-        }
         def scriptList = []
         new File(dir).eachFile FileType.FILES, { 
             if (it.name != 'Sample.R' 
