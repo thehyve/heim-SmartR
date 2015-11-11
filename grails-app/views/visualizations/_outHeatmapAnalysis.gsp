@@ -970,14 +970,17 @@
             var leafs = d.index.split(' ');
             var genes = [];
             for (var i = 0; i < leafs.length; i++) {
-                var gene = geneSymbols[leafs[i]];
+                var uid = uids[leafs[i]];
+                var split = uid.split("--");
+                var gene = split[split.length - 1];
                 genes.push(gene);
             }
-            var geneList = genes.toString().replace(",", " ");
+            var geneList = genes.join(" ");
             jQuery.ajax({
                 url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                 type: "POST",
-                timeout: '600000',
+                timeout: '10000',
+                async: false,
                 data: {
                     section: 'upload_gene_lists_general',
                     primary_org: 'human',
@@ -992,7 +995,7 @@
                 var url = "http://biocompendium.embl.de/cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=" + sessionID + "&list=gene_list_1__1&list_size=15&org=human";
                 window.open(url);
             }).fail(function() {
-                alert('fail');
+                alert('An error occured. Maybe the external resource is unavailable.');
             });
         })
         .on("mouseover", function(d) {
