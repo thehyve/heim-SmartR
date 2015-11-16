@@ -42,8 +42,8 @@ makeMatrix <- function(raw.data) {
 }
 
 fixString <- function(str) {
-    str <- gsub("(?!-)[[:punct:]]", "_", str, perl=TRUE)
-    str <- gsub(" ", "_", str)
+    str <- gsub("(?!-)[[:punct:]]", "", str, perl=TRUE)
+    str <- gsub(" ", "", str)
     str
 }
 
@@ -164,7 +164,7 @@ rowDendrogramManhattanSingle <- computeDendrogram(zScoreMatrix[, -1], 'manhattan
 rowDendrogramManhattanAverage <- computeDendrogram(zScoreMatrix[, -1], 'manhattan', 'average')
 
 getFeatureName <- function(concept) {
-    featureName <- tail(strsplit(concept, '\\\\')[[1]], n=1)
+    featureName <- paste(tail(strsplit(concept, '\\\\')[[1]], n=2), collapse='--')
     featureName <- fixString(featureName)
     featureName
 }

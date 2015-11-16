@@ -12,14 +12,15 @@ class SmartRController {
     def computeResults = {
         params.init = params.init == null ? true : params.init // defaults to true
         def retCode = smartRService.runScript(params)
+        print retCode
         render retCode.toString()
     }
 
     def reComputeResults = {
         params.init = false
-        redirect controller: 'SmartR',
-                 action: 'computeResults', 
-                 params: params
+        def retCode = smartRService.runScript(params)
+        print retCode
+        render retCode.toString()
     }
 
     // For handling results yourself
@@ -43,9 +44,9 @@ class SmartRController {
         } else {
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
                     model: [results: results.json, image: results.img.toString()]
-        }       
+        }
     }
-    
+
     /**
     *   Renders the input form for initial script parameters
     */

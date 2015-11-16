@@ -12,6 +12,7 @@ class SmartRService {
     def DEBUG = Environment.current == Environment.DEVELOPMENT
     def DEBUG_TMP_DIR = '/tmp/'
     def ENABLE_STATIC_WORKFLOWS = false
+    def UNFINISHED_WORKFLOWS = ['VolcanoplotAnalysis.R']
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
@@ -19,21 +20,21 @@ class SmartRService {
     def dataQueryService
     def scriptExecutorService
 
-
     def getScriptList() {
         def dir = getWebAppFolder() + 'Scripts/smartR/'
         def scriptList = []
-        new File(dir).eachFile FileType.FILES, { 
-            if (it.name != 'Sample.R' 
+        new File(dir).eachFile FileType.FILES, {
+            if (it.name != 'Sample.R'
                     && it.name[0] != '.'
-                    && (ENABLE_STATIC_WORKFLOWS || ! it.name.contains('STATIC'))) {
+                    && (ENABLE_STATIC_WORKFLOWS || ! it.name.contains('STATIC'))
+                    && (DEBUG || ! it.name in UNFINISHED_WORKFLOWS)) {
                 scriptList << it.name
             }
         }
         return scriptList
     }
 
-	
+
     def queryData(parameterMap) {
         def data_cohort1 = [:]
         def data_cohort2 = [:]
@@ -106,7 +107,7 @@ class SmartRService {
             return grailsApplication
                 .mainContext
                 .servletContext
-                .getRealPath('/plugins/') + '/smart-r-0.3/'
+                .getRealPath('/plugins/') + '/smart-r-0.4/'
         }
     }
 
@@ -129,6 +130,10 @@ class SmartRService {
 
         try {
             parameterMap = createParameterMap(params)
+            // we clear the session here already because a network timeout during the new DB query can cause the resycling of the previous DB query
+            if (parameterMap['init']) {
+                scriptExecutorService.clearSession(parameterMap['cookieID'])
+            }
         } catch (e) {
             print e
             return 1
@@ -142,9 +147,9 @@ class SmartRService {
             print e
             return 2
         }
-        
+
         try {
-            scriptExecutorService.run(parameterMap)        
+            scriptExecutorService.run(parameterMap)
         } catch(e) {
             print e
             return 3

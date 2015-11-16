@@ -790,7 +790,7 @@ function computeResults(callback, data, init, redraw) {
 
     var retCodes = {
         1: 'An unexpected error occured while initializing environment.',
-        2: 'An unexpected error occured while accessing the database.', 
+        2: 'An unexpected error occured while accessing the database.',
         3: 'An unexpected error occured while processing the data.'
     };
 
@@ -867,7 +867,7 @@ function changeInputDIV() {
 }
 
 function contact() {
-    var version = 0.3;
+    var version = 0.4;
     alert("Before reporting a bug...\n" +
         "... 1. Make sure you use the lastet SmartR version (installed version: " + version + ")\n" +
         "... 2. Make sure that all requirements for using SmartR are met\n" +
