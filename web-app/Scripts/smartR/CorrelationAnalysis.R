@@ -34,10 +34,6 @@ patientIDs <- xArr$patientID
 xArr <- xArr$value
 yArr <- yArr$value
 
-if (length(xArr) != length(yArr)) {
-	stop(paste('Both variables must have the same number of patients!', length(xArr), length(yArr)))
-}
-
 selection <- (xArr >= xLow
 			& xArr <= xHigh
 			& yArr >= yLow
@@ -58,7 +54,15 @@ if (length(annotations) > 0) {
 	tags <- tags[order(sorting)]
 }
 
-corTest <- cor.test(xArr, yArr, method=method)
+corTest <- tryCatch({
+	cor.test(xArr, yArr, method=method)
+}, error = function(e) {
+	ll <- list()
+	ll$estimate <- NA
+	ll$p.value <- NA
+	ll
+})
+
 regLineSlope <- corTest$estimate * (sd(yArr) / sd(xArr))
 regLineYIntercept <- mean(yArr) - regLineSlope * mean(xArr)
 

@@ -807,8 +807,10 @@ function computeResults(callback, data, init, redraw) {
             } else {
                 renderResults(callback, data);
             }
-        } else { // expected error
-            jQuery("#outputDIV").html('');
+        } else {
+            if (init) {
+                jQuery("#outputDIV").html('');
+            }
             alert(retCodes[response]);
         }
     }).fail(function(_, __, error){
@@ -818,6 +820,18 @@ function computeResults(callback, data, init, redraw) {
         } else {
             renderResults(callback, data);
         }
+    });
+}
+
+function showLoadingScreen() {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
+        type: "POST",
+        timeout: 1.8e+6
+    }).done(function(response) {
+        jQuery("#outputDIV").html(response);
+    }).fail(function() {
+        jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
     });
 }
 
@@ -835,17 +849,7 @@ function runAnalysis() {
         runAllQueries(runAnalysis);
         return false;
     }
-
-    jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
-        type: "POST",
-        timeout: 1.8e+6
-    }).done(function(response) {
-        jQuery("#outputDIV").html(response);
-    }).fail(function() {
-        jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
-    });
-
+    showLoadingScreen();
     computeResults();
 }
 

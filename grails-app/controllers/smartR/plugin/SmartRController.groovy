@@ -18,7 +18,6 @@ class SmartRController {
     def reComputeResults = {
         params.init = false
         def retCode = smartRService.runScript(params)
-        print retCode
         render retCode.toString()
     }
 

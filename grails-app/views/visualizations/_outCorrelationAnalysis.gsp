@@ -53,6 +53,10 @@
         box-shadow: 10px 10px 20px grey;
     }
 
+    .legend:hover {
+        cursor: move;
+    }
+
     #svgs {
         float: left;
     }
@@ -273,7 +277,7 @@
             if(d3.event.button === 2){
                 d3.event.stopImmediatePropagation();
             }
-        })        
+        })
         .call(brush);
 
         detectedTags = [];
@@ -410,7 +414,7 @@
         if (! selectedData && displayedData.length > 2) {
             minX = d3.min(displayedData, function(d) { return d.x; });
             maxX = d3.max(displayedData, function(d) { return d.x; });
-        } else if (selectedData.length > 3) {
+        } else if (selectedData.length >= 2 && results.regLineSlope[0] !== "NA") {
             minX = d3.min(selectedData, function(d) { return d.x; });
             maxX = d3.max(selectedData, function(d) { return d.x; });
         } else {
@@ -532,7 +536,6 @@
             updateLegend();
             return;
         }
-        updateLegend('Updating...');
         var xLowHigh = d3.extent(selectedData, function(d) { return getOriginalPointWithUID(d.uid).x; });
         var yLowHigh = d3.extent(selectedData, function(d) { return getOriginalPointWithUID(d.uid).y; });
 
@@ -542,8 +545,8 @@
         data = addSettingsToData(data, { yLow: yLowHigh[0] });
         data = addSettingsToData(data, { yHigh: yLowHigh[1] });
 
-        var onResponse = function(reponse) {
-            results = reponse;
+        var onResponse = function(response) {
+            results = response;
             updateRegressionLine();
             updateLegend();
         };
@@ -559,11 +562,12 @@
         setCohorts([div1, div2], true, false, true);
     }
 
-    function updateLegend(text) {
+    function updateLegend() {
+        console.log(results)
         var html = (
-            'Correlation Coefficient: ' + (text ? text : results.correlation)  + '<br/>' +
-            'p-value: ' + (text ? text : results.pvalue) + '<br/>' +
-            'Method: ' + (text ? text : results.method) + '<br/>' + '<br/>' +
+            'Correlation Coefficient: ' + results.correlation[0]  + '<br/>' +
+            'p-value: ' + results.pvalue[0] + '<br/>' +
+            'Method: ' + results.method[0] + '<br/>' + '<br/>' +
             'Selected: ' + selectedData.length + '<br/>' +
             'Displayed: ' + displayedData.length + '<br/>' +
             'Excluded: ' + (originalData.length - displayedData.length)) + '<br/>' + '<br/>';
