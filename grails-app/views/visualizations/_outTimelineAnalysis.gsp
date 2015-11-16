@@ -835,7 +835,6 @@
     }
 
     function removeAutoCorrelationLines() {
-        computingIDs = [];
         d3.selectAll('.correlogram')
         .remove();
     }
@@ -882,56 +881,35 @@
         showCorrelogram = checked;
     }
 
-    var computingIDs = [];
     function computeAutoCorrelationLines(patientID, secondTry) {
         if (! showCorrelogram) {
             return;
         }
-        computingIDs.push(patientID);
-        setTimeout(function() {
-            if (computingIDs[computingIDs.length - 1] !== patientID) {
-                return;
+
+        var data = prepareFormData();
+        data = addSettingsToData(data, { acfPatientID: patientID });
+        data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
+        data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
+
+        var onResponse = function(response) {
+            var acfEstimates = response.acfEstimates;
+            for (var i = 0; i < concepts.length; i++) {
+                var concept = concepts[i];
+                var acfEstimate = acfEstimates[concept];
+                var points = [];
+                for (var j = 0, len = acfEstimate.estimate.length; j < len; j++) {
+                    points.push({'value': acfEstimate.estimate[j], 'timepoint': acfEstimate.sortOrder[j]});
+                }
+                drawCorrelogram(points, concept);
             }
-            var data = prepareFormData();
-            data = addSettingsToData(data, { acfPatientID: patientID });
-            data = addSettingsToData(data, { xAxisSortOrder: x.domain() });
-            data = addSettingsToData(data, { interpolateNAs: interpolateNAs });
-            jQuery.ajax({
-                url: pageInfo.basePath + '/SmartR/updateOutputDIV',
-                type: "POST",
-                timeout: '600000',
-                data: data
-            }).done(function(serverAnswer) {
-                serverAnswer = JSON.parse(serverAnswer);
-                if (computingIDs[computingIDs.length - 1] !== patientID) {
-                    return;
-                }
-                if (serverAnswer.error) {
-                    alert(serverAnswer.error);
-                    return;
-                }
-                var acfEstimates = serverAnswer.acfEstimates;
-                for (var i = 0; i < concepts.length; i++) {
-                    var concept = concepts[i];
-                    var acfEstimate = acfEstimates[concept];
-                    var points = [];
-                    for (var j = 0, len = acfEstimate.estimate.length; j < len; j++) {
-                        points.push({'value': acfEstimate.estimate[j], 'timepoint': acfEstimate.sortOrder[j]});
-                    }
-                    drawCorrelogram(points, concept);
-                }
-                if (computingIDs[computingIDs.length - 1] === patientID) {
-                    computingIDs = [];
-                }
-            }).fail(function() {
-                if (computingIDs[computingIDs.length - 1] === patientID) {
-                    computingIDs = [];
-                    if (! secondTry) {
-                        computeAutoCorrelationLines(patientID, true);
-                    }
-                }
-            });
-        }, 500);
+
+            if (! d3.selectAll('.line.hovered').size()) {
+                removeAutoCorrelationLines();
+            }
+
+        };
+
+        computeResults(onResponse, data, false, false);
     }
 
     function getEqualityCheck(concept, timepoint, patientID, value) {
@@ -1148,15 +1126,15 @@
         height: buttonHeight,
         items: [
             {
-                callback: function() { cluster('COR', 'average'); }, 
+                callback: function() { cluster('COR', 'average'); },
                 label: 'Hierarch.-Corr.-Avg.'
             },
             {
-                callback: function() { cluster('EUCL', 'average'); }, 
+                callback: function() { cluster('EUCL', 'average'); },
                 label: 'Hierarch.-Eucl.-Avg.'
             },
             {
-                callback: function() { cluster('ACF', 'average'); }, 
+                callback: function() { cluster('ACF', 'average'); },
                 label: 'Hierarch.-Autocorr.-Avg.'
             }
         ]
@@ -1208,15 +1186,15 @@
         checked: false
     });
 
-    // createD3Switch({
-    //     location: svg,
-    //     onlabel: 'SHOW Correlogram',
-    //     offlabel: 'HIDE Correlogram',
-    //     x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
-    //     y: 2 - margin.top,
-    //     width: buttonWidth,
-    //     height: buttonHeight,
-    //     callback: swapCorrelogramBoolean,
-    //     checked: true
-    // });
+    createD3Switch({
+        location: svg,
+        onlabel: 'SHOW Correlogram',
+        offlabel: 'HIDE Correlogram',
+        x: 2 - margin.left + buffer * 5 + buttonWidth * 5,
+        y: 2 - margin.top,
+        width: buttonWidth,
+        height: buttonHeight,
+        callback: swapCorrelogramBoolean,
+        checked: true
+    });
 </script>

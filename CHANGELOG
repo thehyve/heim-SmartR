@@ -10,6 +10,7 @@ Current Version 0.4
 - Heatmap: Fixed a bug which caused additional LDD to be not displayed correctly
 - Heatmap: Fixed a bug that occured when two LDD nodes had the same name
 - Fixed a bug which caused the previous session to be resycled when not wanted
+- Timeline: Fixed the correlogram feature after it was broken by 0.3
 
 Version 0.3
 - Fix: Big datasets lead no longer to an unpextect error

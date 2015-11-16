@@ -26,7 +26,7 @@ class SmartRService {
         new File(dir).eachFile FileType.FILES, {
             if (it.name != 'Sample.R'
                     && it.name[0] != '.'
-                    && (ENABLE_STATIC_WORKFLOWS || ! it.name.contains('STATIC'))
+                    && (DEBUG || ENABLE_STATIC_WORKFLOWS || ! it.name.contains('STATIC'))
                     && (DEBUG || ! it.name in UNFINISHED_WORKFLOWS)) {
                 scriptList << it.name
             }
