@@ -380,17 +380,17 @@ function createD3Slider(args) {
 }
 
 /**
-*   Gets the x position of the mouse on the screen (TODO: this is not as precise as I want it to be)
+*   Gets the x position of the mouse on the screen
 *
 *   @return {int}: x coordinate of the mouse
 */
 function mouseX() {
     var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
-    return mouseXPos - jQuery('#etrikspanel').offset().left + jQuery('#outputDIV').parent().scrollLeft();
+    return mouseXPos - jQuery('#etrikspanel').offset().left + jQuery('#index').parent().scrollLeft();
 }
 
 /**
-*   Gets the y position of the mouse on the screen (TODO: this is not as precise as I want it to be)
+*   Gets the y position of the mouse on the screen
 *
 *   @return {int}: y coordinate of the mouse
 */

@@ -12,7 +12,6 @@ class SmartRController {
     def computeResults = {
         params.init = params.init == null ? true : params.init // defaults to true
         def retCode = smartRService.runScript(params)
-        print retCode
         render retCode.toString()
     }
 
