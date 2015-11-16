@@ -411,15 +411,8 @@
     }
 
 	var lineGen = d3.svg.line()
+    .defined(function(d) { return x.domain().indexOf(d.timepoint) !== -1; })
 	.x(function(d) {
-        if (x.domain().indexOf(d.timepoint) < 0) {
-            var index = timepoints.indexOf(d.timepoint);
-            var firstDomainIndex = timepoints.indexOf(x.domain()[0]);
-            if (index < firstDomainIndex) {
-                return 0;
-            }
-            return timelineWidth;
-        }
         return x(d.timepoint);
     })
 	.y(function(d) { return y(d.value); })
