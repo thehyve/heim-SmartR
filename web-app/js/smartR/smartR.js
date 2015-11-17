@@ -411,7 +411,7 @@ function showCohortInfo(){
         }
     }
     if (cohortsSummary === '') {
-        cohortsSummary = 'WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.';
+        cohortsSummary = '<br/>WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.';
     }
     jQuery('#cohortInfo').html(cohortsSummary);
 }

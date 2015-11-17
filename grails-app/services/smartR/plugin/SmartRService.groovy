@@ -23,17 +23,17 @@ class SmartRService {
     def getScriptList() {
         def dir = getWebAppFolder() + 'Scripts/smartR/'
         def scriptList = []
-        new File(dir).eachFile FileType.FILES, {
-            if (it.name != 'Sample.R'
-                    && it.name[0] != '.'
-                    && (DEBUG || ENABLE_STATIC_WORKFLOWS || ! it.name.contains('STATIC'))
-                    && (DEBUG || ! it.name in UNFINISHED_WORKFLOWS)) {
-                scriptList << it.name
+        new File(dir).eachFile {
+            def name = it.getName()
+            if (name != 'Sample.R'
+                    && name[0] != '.'
+                    && (DEBUG || ENABLE_STATIC_WORKFLOWS || ! name.contains('STATIC'))
+                    && (DEBUG || ! (name in UNFINISHED_WORKFLOWS))) {
+                scriptList << name
             }
         }
         return scriptList
     }
-
 
     def queryData(parameterMap) {
         def data_cohort1 = [:]
@@ -130,7 +130,7 @@ class SmartRService {
 
         try {
             parameterMap = createParameterMap(params)
-            // we clear the session here already because a network timeout during the new DB query can cause the resycling of the previous DB query
+            // we clear the session here already because a network timeout during the new DB query can cause the resycling of the previous workflow
             if (parameterMap['init']) {
                 scriptExecutorService.clearSession(parameterMap['cookieID'])
             }
