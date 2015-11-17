@@ -25,9 +25,7 @@ class SmartRController {
     def renderResults = {
         params.init = false
         def (success, results) = scriptExecutorService.getResults(params.cookieID)
-        if (! success && results == 'RUNNING') {
-            render results
-        } else if (! success) {
+        if (! success) {
             render new JsonBuilder([error: results]).toString()
         } else {
             render results.json // TODO: return json AND image

@@ -776,14 +776,15 @@ function renderResults(callback, data) {
         timeout: 1.8e+6,
         data: data
     }).done(function(response) {
-        if (response === 'RUNNING') {
+        response = JSON.parse(response);
+        if (response.error === 'RUNNING') {
             setTimeout(renderResults(callback, data), 5000);
-        } else if (JSON.parse(response).error) {
+        } else if (response.error) {
             jQuery('#submitButton').prop('disabled', false);
             alert(response.error);
         } else {
             jQuery('#submitButton').prop('disabled', false);
-            callback(JSON.parse(response));
+            callback(response);
         }
     }).fail(function() {
         jQuery('#submitButton').prop('disabled', false);
@@ -824,7 +825,6 @@ function computeResults(callback, data, init, redraw) {
             alert(retCodes[response]);
         }
     }).fail(function(_, __, error){
-        // FIXME: Do this only for network timeouts, not for all unexpected errors
         if (redraw) {
             renderResultsInTemplate(callback, data);
         } else {
