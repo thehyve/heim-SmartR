@@ -363,6 +363,12 @@
         };
     }
 
+    function epanechnikovKernel(scale) {
+        return function(u) {
+            return Math.abs(u /= scale) <= 1 ? 0.75 * (1 - u * u) / scale : 0;
+        };
+    }
+
     function gaussKernel(scale) {
         return function(u) {
             return Math.exp(- u * u / 2) / Math.sqrt(2 * Math.PI) / scale;
@@ -651,7 +657,7 @@
 
         yCopy = y.copy();
         yCopy.domain([params.lowerWhisker, params.upperWhisker]);
-        var kde = kernelDensityEstimator(gaussKernel(1), yCopy.ticks(1000));
+        var kde = kernelDensityEstimator(epanechnikovKernel(6), yCopy.ticks(100));
         var values = params.points.map(function(d) { return d.value; });
         var estFun = kde(values);
 
