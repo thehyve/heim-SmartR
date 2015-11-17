@@ -14,6 +14,8 @@ Current Version 0.4
 - Timeline: Fixed the correlogram feature after it was broken by 0.3
 - Timeline: Fixed a bug which occured when the first/last timepoint was not in the zoom range
 - Correlation: Improved behavior when selecting too few points for statistics
+- Correlation: Increased scatterplot size
+- Boxplot: Replaced the KDE gauss kernel with the epanechnikov kernel for smoother plots
 
 Version 0.3
 - Fix: Big datasets lead no longer to an unpextect error

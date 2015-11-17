@@ -145,9 +145,9 @@
     .attr('width', jQuery("#etrikspanel").width())
     .attr('height', 45);
 
-    var margin = {top: 20, right: 40, bottom: 5, left: 10};
-    var width = jQuery("#etrikspanel").width() / 2 - 10 - margin.left - margin.right;
-    var height = jQuery("#etrikspanel").height() / 2 - 10 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 40, bottom: 40, left: 10};
+    var width = jQuery("#etrikspanel").width() * 2/3 - 10 - margin.left - margin.right;
+    var height = jQuery("#etrikspanel").height() * 2/3 - 10 - margin.top - margin.bottom;
 
     var results = ${results};
     var xLabel = results.xArrLabel;
@@ -303,8 +303,10 @@
         .attr("value", bins)
         .on("change", updateHistogram);
 
+        hist1Width = width * 1 / 3;
+
         histogram1 = d3.select("#histogram1").append("svg")
-        .attr("width", width + margin.left + margin.right)
+        .attr("width", hist1Width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -313,9 +315,11 @@
         .scale(y)
         .orient("right");
 
+        hist2Height = height * 1 / 3;
+
         histogram2 = d3.select("#histogram2").append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", hist2Height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -617,38 +621,38 @@
 
         var hist1BarScale = d3.scale.linear()
         .domain([0, d3.max(hist1Data, function(d) { return d.y; })])
-        .range([0, width]);
+        .range([0, hist1Width]);
 
         var hist2BarScale = d3.scale.linear()
         .domain([0, d3.max(hist2Data, function(d) { return d.y; })])
-        .range([0, height]);
+        .range([0, hist2Height]);
 
         hist1Bar.append("rect")
         .attr("width", 0)
         .attr("height", hist1Data[0].dx)
-        .attr("x", width)
+        .attr("x", hist1Width)
         .attr("y", function(d, i) { return hist1Data[i].x; })
         .transition()
         .delay(function(d, i) { return i * 25; })
         .duration(animationDuration)
-        .attr("x", function(d) { return width - hist1BarScale(d.y); })
+        .attr("x", function(d) { return hist1Width - hist1BarScale(d.y); })
         .attr("width", function(d) { return hist1BarScale(d.y); });
 
         hist1Bar.append("text")
         .attr('class', 'text')
-        .attr("x", width)
+        .attr("x", hist1Width)
         .attr("y", function(d, i) { return hist1Data[i].x; })
         .transition()
         .delay(function(d, i) { return i * 25; })
         .duration(animationDuration)
         .attr("dy", ".35em")
-        .attr("x", function(d) { return width - hist1BarScale(d.y) + 10; })
+        .attr("x", function(d) { return hist1Width - hist1BarScale(d.y) + 10; })
         .attr("y", function(d, i) { return hist1Data[i].x + hist1Data[i].dx / 2; })
         .text(function(d) { return d.y ? d.y : ''; });
 
         histogram1.append("g")
         .attr("class", "x axis text")
-        .attr("transform", "translate(" + width + "," + 0 + ")")
+        .attr("transform", "translate(" + hist1Width + "," + 0 + ")")
         .call(hist1xAxis);
 
         hist2Bar.append("rect")
