@@ -11,6 +11,10 @@
         stroke-width: 0;
     }
 
+    .square:hover {
+        cursor: pointer;
+    }
+
     .extraSquare {
         stroke: white;
         stroke-width: 0;
@@ -674,14 +678,7 @@
         .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";})
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
-        .text('↑↓')
-        .attr('visibility', function(d) {
-            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
-                return 'visible';
-            } else {
-                return 'hidden';
-            }
-        });
+        .text('↑↓');
 
         featureSortText
         .transition()
@@ -700,39 +697,38 @@
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight / 2)
         .on("click", function(feature) {
-            var featureValue = [];
+            var featureValues = [];
             var missingValues = false;
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
-                var zScore = - Math.pow(2,32);
+                var value = (- Math.pow(2,32)).toString();
                 try {
                     var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
-                    zScore = square.property('__data__').ZSCORE;
+                    value = square.property('__data__').VALUE;
                 } catch (err) {
                     missingValues = true;
                 }
-                featureValue.push([i, zScore]);
+                featureValues.push([i, value]);
             }
-            if (isSorted(featureValue)) {
-               featureValue.sort(function(a, b) { return a[1] - b[1]; });
+            if (isSorted(featureValues)) {
+                featureValues.sort(function(a, b) {
+                    var diff = a[1] - b[1];
+                    return isNaN(diff) ? a[1].localeCompare(b[1]) : diff;
+                });
             } else {
-               featureValue.sort(function(a, b) { return b[1] - a[1]; });
+               featureValues.sort(function(a, b) {
+                    var diff = b[1] - a[1];
+                    return isNaN(diff) ? b[1].localeCompare(a[1]) : diff;
+                });
             }
             var sortValues = [];
-            for (i = 0; i < featureValue.length; i++) {
-                sortValues.push(featureValue[i][0]);
+            for (i = 0; i < featureValues.length; i++) {
+                sortValues.push(featureValues[i][0]);
             }
             if (missingValues) {
                 alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting;');
             }
             updateColOrder(sortValues);
-        })
-        .attr('visibility', function(d) {
-            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
-                return 'visible';
-            } else {
-                return 'hidden';
-            }
         });
 
 
@@ -743,6 +739,19 @@
         .attr('y', function(d, i) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight / 2);
+    }
+
+    function isSorted(arr) {
+        var sorted = true;
+        for (var i = 0, len = arr.length - 1; i < len; i++) {
+            var diff = arr[i][1] - arr[i+1][1];
+            diff = isNaN(diff) ? arr[i][1].localeCompare(arr[i+1][1]) : diff;
+            if (diff < 0) {
+                sorted = false;
+                break;
+            }
+        }
+        return sorted;
     }
 
     function zoom(zoomLevel) {

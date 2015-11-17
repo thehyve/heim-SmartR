@@ -418,24 +418,6 @@ function getMaxWidth(elements) {
 }
 
 /**
-*   Checks if array is sorted (descending)
-*
-*   @param {[]} arr: arbitray array
-*   @return {bool}: true if array is sorted descending, false otherwise
-*/
-function isSorted(arr) {
-    var sorted = true;
-
-    for (var i = 0, len = arr.length - 1; i < len; i++) {
-        if (arr[i][1] < arr[i+1][1]) {
-            sorted = false;
-            break;
-        }
-    }
-    return sorted;
-}
-
-/**
 *   Compares two arrays with each other
 *
 *   @param {[]} arr1: first array

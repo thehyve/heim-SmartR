@@ -563,7 +563,6 @@
     }
 
     function updateLegend() {
-        console.log(results)
         var html = (
             'Correlation Coefficient: ' + results.correlation[0]  + '<br/>' +
             'p-value: ' + results.pvalue[0] + '<br/>' +
