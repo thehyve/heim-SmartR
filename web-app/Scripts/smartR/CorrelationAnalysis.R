@@ -58,8 +58,8 @@ corTest <- tryCatch({
 	cor.test(xArr, yArr, method=method)
 }, error = function(e) {
 	ll <- list()
-	ll$estimate <- NA
-	ll$p.value <- NA
+	ll$estimate <- as.numeric(NA)
+	ll$p.value <- as.numeric(NA)
 	ll
 })
 
