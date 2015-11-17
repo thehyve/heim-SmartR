@@ -15,6 +15,12 @@ if (! is.null(SmartR.settings$xLow)) {
 
 ### COMPUTE RESULTS ###
 
+conceptStrToFolderStr <- function(s) {
+    splitString <- strsplit(s, "")[[1]]
+    backslashs <- which(splitString == "\\")
+    substr(s, 0, tail(backslashs, 2)[1])
+}
+
 points <- SmartR.data.cohort1$datapoints
 concepts <- unique(points$concept)
 if (! length(points)) {
@@ -43,6 +49,10 @@ yArr <- yArr[selection]
 patientIDs <- patientIDs[selection]
 
 annotations <- SmartR.data.cohort1$annotations
+folders <- as.vector(sapply(annotations$concept, conceptStrToFolderStr))
+if (length(unique(folders)) > 1) {
+	stop("Sorry, but at this moment only one folder at a time is supported for annotation.")
+}
 tags <- list()
 if (length(annotations) > 0) {
 	annotations <- annotations[annotations$patientID %in% patientIDs, ]

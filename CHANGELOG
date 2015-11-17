@@ -8,6 +8,7 @@ Current Version 0.4
 - New Feature: Subset selection is now shown in the SmartR tab, similar to Advanced Workflows
 - General: Improved error handling
 - General: Fixed a bug which caused the previous session to be resycled when not wanted
+- General: Fixed a bug which caused the "(Re-)Run Analysis" button to remain disabled under certain conditions
 - Heatmap Workflow: Fixed a bug which caused the "Load 100 add. feat." button to fail
 - Heatmap Workflow: Fixed a bug that sometimes occured when applying a cutoff
 - Heatmap Workflow: Fixed a bug which caused additional LDD to be not displayed correctly

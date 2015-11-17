@@ -820,6 +820,7 @@ function computeResults(callback, data, init, redraw) {
             if (init) {
                 jQuery("#outputDIV").html('');
             }
+            jQuery('#submitButton').prop('disabled', false);
             alert(retCodes[response]);
         }
     }).fail(function(_, __, error){
