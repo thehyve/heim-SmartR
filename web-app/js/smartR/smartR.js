@@ -399,6 +399,33 @@ function mouseY() {
     return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#etrikspanel').offset().top;
 }
 
+function showCohortInfo(){
+    var cohortsSummary = '';
+
+    for(var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
+        var currentQuery = getQuerySummary(i);
+        if(currentQuery !== '') {
+            cohortsSummary += "<br/>Subset " + i + ": <br/>";
+            cohortsSummary += currentQuery;
+            cohortsSummary += "<br/>";
+        }
+    }
+    if (cohortsSummary === '') {
+        cohortsSummary = 'WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.';
+    }
+    jQuery('#cohortInfo').html(cohortsSummary);
+}
+showCohortInfo();
+
+function updateInputView() {
+    if (typeof updateOnView === "function") {
+        updateOnView();
+    }
+}
+
+jQuery('#resultsTabPanel__etrikspanel').click(showCohortInfo);
+jQuery('#resultsTabPanel__etrikspanel').click(updateInputView);
+
 /**
 *   Finds the maximum width of several drawn text elements
 *
@@ -847,6 +874,7 @@ function changeInputDIV() {
         data: {'script': jQuery('#scriptSelect').val()}
     }).done(function(response) {
         jQuery("#inputDIV").html(response);
+        updateInputView();
     }).fail(function() {
         jQuery("#inputDIV").html("Coult not render input form. Probably you lost network connection.");
     });

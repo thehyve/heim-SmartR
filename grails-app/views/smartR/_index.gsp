@@ -2,6 +2,10 @@
     .txt {
         font-family: 'Roboto', sans-serif;
     }
+
+    #cohortInfo {
+        font-size: 11px;
+    }
 </style>
 
 <head>
@@ -33,7 +37,8 @@
         <hr class="myhr"/>
         <g:select name="scriptSelect" class='txt' from="${scriptList}" noSelection="['':'Choose an algorithm']" onchange="changeInputDIV()"/>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runAnalysis()"/>
+        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runAnalysis()"/><br/>
+        <div id="cohortInfo" class='txt'></div>
         <hr class="myhr"/>
     </div>
 

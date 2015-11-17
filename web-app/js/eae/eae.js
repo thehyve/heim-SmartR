@@ -11,6 +11,8 @@ function goToSmartRScript() {
     }).fail(function() {
         jQuery("#index").html("AJAX CALL FAILED!");
     });
+
+    showCohortInfo();
 }
 
 /**
