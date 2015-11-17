@@ -12,7 +12,7 @@ class SmartRService {
     def DEBUG = Environment.current == Environment.DEVELOPMENT
     def DEBUG_TMP_DIR = '/tmp/'
     def ENABLE_STATIC_WORKFLOWS = false
-    def UNFINISHED_WORKFLOWS = ['VolcanoplotAnalysis.R']
+    def UNFINISHED_WORKFLOWS = ['VolcanoAnalysis.R']
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
