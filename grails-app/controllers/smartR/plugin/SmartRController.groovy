@@ -1,6 +1,9 @@
 package smartR.plugin
 
 import groovy.json.JsonBuilder
+import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.apache.commons.io.FilenameUtils
 
 class SmartRController {
@@ -63,7 +66,16 @@ class SmartRController {
      *   Go to eTRIKS Analytical Engine
      */
     def goToEAEngine = {
-        render template: '/eae/home', model:[ hpcScriptList: eaeService.hpcScriptList] }
+        render template: '/eae/home', model:[ hpcScriptList: eaeService.hpcScriptList]
+    }
 
-
+    def loadScripts = {
+        JSONObject result = new JSONObject()
+        JSONObject script = new JSONObject()
+        script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/etriksEngines/engineSelection.js" as String)
+        script.put("type", "script")
+        result.put("success", true)
+        result.put("files", new JSONArray() << script)
+        render result as JSON;
+    }
 }

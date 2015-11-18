@@ -22,6 +22,8 @@ var etriksPanel = new Ext.Panel({
     }
 });
 
+var smartRPanel = etriksPanel;
+
 /**
  *   Renders the input form for entering the parameters for a visualization/script
  */
