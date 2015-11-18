@@ -12,11 +12,11 @@
 
 # remember registerConceptBox('somedata', [1], ...) ?
 # This is where it appears again
-data <- data.cohort1$somedata
+data <- SmartR.data.cohort1$somedata
 
 # remember getSettings()?
 # Here the list entries of 'settings' map whatever map you returned in the input view!
-doStuff <- strtoi(settings$doStuff)
+doStuff <- strtoi(SmartR.settings$doStuff)
 
 # do some statistics or data filtering if you want
 abc <- c()

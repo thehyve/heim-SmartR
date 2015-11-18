@@ -31,29 +31,18 @@
 
 
 
-
 	// Oh and if you need on-the-fly updates but don't want to compute it in the browser:
 	var data = prepareFormData();
     data = addSettingsToData(data, { foobar: [1,2,3] });
     data = addSettingsToData(data, { blub: 'bla' });
-	jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/updateOutputDIV',
-        type: "POST",
-        timeout: '600000',
-        data: data
-    }).done(function(serverAnswer) {
-        serverAnswer = JSON.parse(serverAnswer);
-        if (serverAnswer.error) {
-            alert(serverAnswer.error);
-            return;
-        }
-        // do stuff with serverAnswer
-        // serverAnswer is just like the initial results variable and
-        // maps to the updated output list in your R script
-    }).fail(function() {
-        // react to a failure
-    });
 
+    var onResponse = function(response) {
+        // do stuff with the server response
+        // response is just like the initial results variable and
+        // maps to the updated SmartR.output list in your R script
+    };
 
+    // launch ajax call
+    computeResults(onResponse, data, false, false);
 
 </script>
