@@ -2,6 +2,10 @@
     .txt {
         font-family: 'Roboto', sans-serif;
     }
+
+    #cohortInfo {
+        font-size: 11px;
+    }
 </style>
 
 <head>
@@ -12,6 +16,14 @@
 </head>
 
 <body>
+    <div id="switch" style="text-align: right">
+    <input
+            id="goEAE"
+            class='txt flatbutton'
+            type="button"
+            value="Go To EAE"
+            onclick="goToEAE()"/>
+    </div>
     <div id="index" style="text-align: center">
         <h1 class="txt"> SmartR - Dynamic data visualization and interaction.</h1>
         <span style='color:red' class='txt'>Please be aware that this software is currently in a TESTING phase and all results should be handled with care.</span><br/>
@@ -25,7 +37,8 @@
         <hr class="myhr"/>
         <g:select name="scriptSelect" class='txt' from="${scriptList}" noSelection="['':'Choose an algorithm']" onchange="changeInputDIV()"/>
         &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="computeResults()"/>
+        <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runAnalysis()"/><br/>
+        <div id="cohortInfo" class='txt'></div>
         <hr class="myhr"/>
     </div>
 

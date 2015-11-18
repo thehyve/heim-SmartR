@@ -1,34 +1,27 @@
 package smartR.plugin
 
-import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.json.JSONArray
 import groovy.json.JsonBuilder
+import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.apache.commons.io.FilenameUtils
-
 
 class SmartRController {
 
     def smartRService
     def scriptExecutorService
-
-    def index = {
-        def dir = smartRService.getWebAppFolder() + '/Scripts/'
-        def scriptList = new File(dir).list().findAll { it != 'Wrapper.R' && it != 'Sample.R' }
-        [scriptList: scriptList]
-    }
+    def eaeService
 
     def computeResults = {
         params.init = params.init == null ? true : params.init // defaults to true
-        smartRService.runScript(params)
-        render ''
+        def retCode = smartRService.runScript(params)
+        render retCode.toString()
     }
 
     def reComputeResults = {
         params.init = false
-        redirect controller: 'SmartR',
-                 action: 'computeResults', 
-                 params: params
+        def retCode = smartRService.runScript(params)
+        render retCode.toString()
     }
 
     // For handling results yourself
@@ -38,7 +31,7 @@ class SmartRController {
         if (! success) {
             render new JsonBuilder([error: results]).toString()
         } else {
-            render results
+            render results.json // TODO: return json AND image
         }
     }
 
@@ -49,10 +42,10 @@ class SmartRController {
             render results
         } else {
             render template: "/visualizations/out${FilenameUtils.getBaseName(params.script)}",
-                    model: [results: results]
-        }       
+                    model: [results: results.json, image: results.img.toString()]
+        }
     }
-    
+
     /**
     *   Renders the input form for initial script parameters
     */
@@ -70,12 +63,16 @@ class SmartRController {
 
 
     /**
-    *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
-    */
+     *   Go to eTRIKS Analytical Engine
+     */
+    def goToEAEngine = {
+        render template: '/eae/home', model:[ hpcScriptList: eaeService.hpcScriptList]
+    }
+
     def loadScripts = {
         JSONObject result = new JSONObject()
         JSONObject script = new JSONObject()
-        script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/smartR/smartR.js" as String)
+        script.put("path", "${servletContext.contextPath}${pluginContextPath}/js/etriksEngines/engineSelection.js" as String)
         script.put("type", "script")
         result.put("success", true)
         result.put("files", new JSONArray() << script)

@@ -53,6 +53,10 @@
         box-shadow: 10px 10px 20px grey;
     }
 
+    .legend:hover {
+        cursor: move;
+    }
+
     #svgs {
         float: left;
     }
@@ -138,12 +142,12 @@
     }
 
     var controls = d3.select('#controls').append('svg')
-    .attr('width', jQuery("#smartRPanel").width())
+    .attr('width', jQuery("#etrikspanel").width())
     .attr('height', 45);
 
-    var margin = {top: 20, right: 40, bottom: 5, left: 10};
-    var width = jQuery("#smartRPanel").width() / 2 - 10 - margin.left - margin.right;
-    var height = jQuery("#smartRPanel").height() / 2 - 10 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 40, bottom: 40, left: 10};
+    var width = jQuery("#etrikspanel").width() * 2/3 - 10 - margin.left - margin.right;
+    var height = jQuery("#etrikspanel").height() * 2/3 - 10 - margin.top - margin.bottom;
 
     var results = ${results};
     var xLabel = results.xArrLabel;
@@ -273,7 +277,7 @@
             if(d3.event.button === 2){
                 d3.event.stopImmediatePropagation();
             }
-        })        
+        })
         .call(brush);
 
         detectedTags = [];
@@ -299,8 +303,10 @@
         .attr("value", bins)
         .on("change", updateHistogram);
 
+        hist1Width = width * 1 / 3;
+
         histogram1 = d3.select("#histogram1").append("svg")
-        .attr("width", width + margin.left + margin.right)
+        .attr("width", hist1Width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -309,9 +315,11 @@
         .scale(y)
         .orient("right");
 
+        hist2Height = height * 1 / 3;
+
         histogram2 = d3.select("#histogram2").append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", hist2Height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -410,7 +418,7 @@
         if (! selectedData && displayedData.length > 2) {
             minX = d3.min(displayedData, function(d) { return d.x; });
             maxX = d3.max(displayedData, function(d) { return d.x; });
-        } else if (selectedData.length > 3) {
+        } else if (selectedData.length >= 2 && results.regLineSlope[0] !== "NA") {
             minX = d3.min(selectedData, function(d) { return d.x; });
             maxX = d3.max(selectedData, function(d) { return d.x; });
         } else {
@@ -532,7 +540,6 @@
             updateLegend();
             return;
         }
-        updateLegend('Updating...');
         var xLowHigh = d3.extent(selectedData, function(d) { return getOriginalPointWithUID(d.uid).x; });
         var yLowHigh = d3.extent(selectedData, function(d) { return getOriginalPointWithUID(d.uid).y; });
 
@@ -542,13 +549,13 @@
         data = addSettingsToData(data, { yLow: yLowHigh[0] });
         data = addSettingsToData(data, { yHigh: yLowHigh[1] });
 
-        var doOnResponse = function(reponse) {
-            results = reponse;
+        var onResponse = function(response) {
+            results = response;
             updateRegressionLine();
             updateLegend();
         };
 
-        updateStatistics(doOnResponse, data, false);
+        computeResults(onResponse, data, false, false);
     }
 
     function updateCohorts() {
@@ -559,11 +566,11 @@
         setCohorts([div1, div2], true, false, true);
     }
 
-    function updateLegend(text) {
+    function updateLegend() {
         var html = (
-            'Correlation Coefficient: ' + (text ? text : results.correlation)  + '<br/>' +
-            'p-value: ' + (text ? text : results.pvalue) + '<br/>' +
-            'Method: ' + (text ? text : results.method) + '<br/>' + '<br/>' +
+            'Correlation Coefficient: ' + results.correlation[0]  + '<br/>' +
+            'p-value: ' + results.pvalue[0] + '<br/>' +
+            'Method: ' + results.method[0] + '<br/>' + '<br/>' +
             'Selected: ' + selectedData.length + '<br/>' +
             'Displayed: ' + displayedData.length + '<br/>' +
             'Excluded: ' + (originalData.length - displayedData.length)) + '<br/>' + '<br/>';
@@ -614,38 +621,38 @@
 
         var hist1BarScale = d3.scale.linear()
         .domain([0, d3.max(hist1Data, function(d) { return d.y; })])
-        .range([0, width]);
+        .range([0, hist1Width]);
 
         var hist2BarScale = d3.scale.linear()
         .domain([0, d3.max(hist2Data, function(d) { return d.y; })])
-        .range([0, height]);
+        .range([0, hist2Height]);
 
         hist1Bar.append("rect")
         .attr("width", 0)
         .attr("height", hist1Data[0].dx)
-        .attr("x", width)
+        .attr("x", hist1Width)
         .attr("y", function(d, i) { return hist1Data[i].x; })
         .transition()
         .delay(function(d, i) { return i * 25; })
         .duration(animationDuration)
-        .attr("x", function(d) { return width - hist1BarScale(d.y); })
+        .attr("x", function(d) { return hist1Width - hist1BarScale(d.y); })
         .attr("width", function(d) { return hist1BarScale(d.y); });
 
         hist1Bar.append("text")
         .attr('class', 'text')
-        .attr("x", width)
+        .attr("x", hist1Width)
         .attr("y", function(d, i) { return hist1Data[i].x; })
         .transition()
         .delay(function(d, i) { return i * 25; })
         .duration(animationDuration)
         .attr("dy", ".35em")
-        .attr("x", function(d) { return width - hist1BarScale(d.y) + 10; })
+        .attr("x", function(d) { return hist1Width - hist1BarScale(d.y) + 10; })
         .attr("y", function(d, i) { return hist1Data[i].x + hist1Data[i].dx / 2; })
         .text(function(d) { return d.y ? d.y : ''; });
 
         histogram1.append("g")
         .attr("class", "x axis text")
-        .attr("transform", "translate(" + width + "," + 0 + ")")
+        .attr("transform", "translate(" + hist1Width + "," + 0 + ")")
         .call(hist1xAxis);
 
         hist2Bar.append("rect")

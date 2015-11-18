@@ -380,24 +380,51 @@ function createD3Slider(args) {
 }
 
 /**
-*   Gets the x position of the mouse on the screen (TODO: this is not as precise as I want it to be)
+*   Gets the x position of the mouse on the screen
 *
 *   @return {int}: x coordinate of the mouse
 */
 function mouseX() {
     var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX;
-    return mouseXPos - jQuery('#smartRPanel').offset().left + jQuery('#outputDIV').parent().scrollLeft();
+    return mouseXPos - jQuery('#etrikspanel').offset().left + jQuery('#index').parent().scrollLeft();
 }
 
 /**
-*   Gets the y position of the mouse on the screen (TODO: this is not as precise as I want it to be)
+*   Gets the y position of the mouse on the screen
 *
 *   @return {int}: y coordinate of the mouse
 */
 function mouseY() {
     var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY;
-    return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#smartRPanel').offset().top;
+    return mouseYPos + jQuery("#index").parent().scrollTop() - jQuery('#etrikspanel').offset().top;
 }
+
+function showCohortInfo(){
+    var cohortsSummary = '';
+
+    for(var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
+        var currentQuery = getQuerySummary(i);
+        if(currentQuery !== '') {
+            cohortsSummary += "<br/>Subset " + i + ": <br/>";
+            cohortsSummary += currentQuery;
+            cohortsSummary += "<br/>";
+        }
+    }
+    if (cohortsSummary === '') {
+        cohortsSummary = '<br/>WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.';
+    }
+    jQuery('#cohortInfo').html(cohortsSummary);
+}
+showCohortInfo();
+
+function updateInputView() {
+    if (typeof updateOnView === "function") {
+        updateOnView();
+    }
+}
+
+jQuery('#resultsTabPanel__etrikspanel').click(showCohortInfo);
+jQuery('#resultsTabPanel__etrikspanel').click(updateInputView);
 
 /**
 *   Finds the maximum width of several drawn text elements
@@ -415,24 +442,6 @@ function getMaxWidth(elements) {
         }
     });
     return currentMax;
-}
-
-/**
-*   Checks if array is sorted (descending)
-*
-*   @param {[]} arr: arbitray array
-*   @return {bool}: true if array is sorted descending, false otherwise
-*/
-function isSorted(arr) {
-    var sorted = true;
-
-    for (var i = 0, len = arr.length - 1; i < len; i++) {
-        if (arr[i][1] < arr[i+1][1]) {
-            sorted = false;
-            break;
-        }
-    }
-    return sorted;
 }
 
 /**
@@ -518,7 +527,7 @@ function setCohorts(constrains, andConcat, negate, reCompute, subset) {
         appendItemFromConceptInto(destination, constrains[i], negate);
     }
     if (reCompute) {
-        runAllQueries(computeResults);
+        runAllQueries(runAnalysis);
     }
 }
 
@@ -543,37 +552,6 @@ function activateDragAndDrop(divName) {
     var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'});
     dtgI.notifyDrop = dropOntoCategorySelection;
 }
-
-// Panel item for the SmartR plugin
-var smartRPanel = new Ext.Panel({
-    id: 'smartRPanel',
-    title: 'SmartR',
-    region: 'center',
-    split: true,
-    height: 90,
-    layout: 'fit',
-    collapsible: true,
-    autoScroll: true,
-    tbar: new Ext.Toolbar({
-        id: 'smartRToolbar',
-        title: 'R Scripts',
-        items: []
-    }),
-    autoLoad: {
-        url: pageInfo.basePath + '/smartR/index',
-        method: 'POST',
-        evalScripts: false
-    },
-    listeners: {
-        render: function(panel) {
-            panel.body.on('click', function() {
-                if (typeof updateOnView === "function") {
-                    updateOnView();
-                }
-            });
-        }
-    }
-});
 
 /**
 *   Clears drag & drop selections from the given div
@@ -711,19 +689,47 @@ function setSmartRCookie() {
     return id;
 }
 
+function setImage(divName, image) {
+    function _arrayBufferToBase64( buffer ) {
+        var binary = '';
+        var bytes = new Uint8Array( buffer );
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+            binary += String.fromCharCode( bytes[ i ] );
+        }
+        return window.btoa( binary );
+    }
+
+    var img = document.createElement('img');
+    img.setAttribute('src', "data:image/png;base64," + _arrayBufferToBase64(image));
+    document.getElementById(divName).appendChild(img);
+}
+
+function goToEAE() {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/goToEAEngine' ,
+        type: "POST",
+        timeout: '600000'
+    }).done(function(response) {
+        jQuery("#index").html(response);
+    }).fail(function() {
+        jQuery("#index").html("AJAX CALL FAILED!");
+    });
+}
+
 function renderResultsInTemplate(callback, data) {
     jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderResultsInTemplate',
         type: "POST",
         timeout: 1.8e+6,
         data: data
-    }).done(function(serverAnswer) {
-        if (serverAnswer === 'RUNNING') {
+    }).done(function(response) {
+        if (response === 'RUNNING') {
             setTimeout(renderResultsInTemplate(callback, data), 5000);
         } else {
             jQuery('#submitButton').prop('disabled', false);
             callback();
-            jQuery("#outputDIV").html(serverAnswer);
+            jQuery("#outputDIV").html(response);
         }
     }).fail(function() {
         jQuery('#submitButton').prop('disabled', false);
@@ -738,18 +744,16 @@ function renderResults(callback, data) {
         type: "POST",
         timeout: 1.8e+6,
         data: data
-    }).done(function(serverAnswer) {
-        serverAnswer = JSON.parse(serverAnswer);
-        if (serverAnswer.error) {
-            if (serverAnswer.error === 'RUNNING') {
-                setTimeout(renderResults(callback, data), 5000);
-            } else {
-                jQuery('#submitButton').prop('disabled', false);
-                alert(serverAnswer.error);
-            }
+    }).done(function(response) {
+        response = JSON.parse(response);
+        if (response.error === 'RUNNING') {
+            setTimeout(renderResults(callback, data), 5000);
+        } else if (response.error) {
+            jQuery('#submitButton').prop('disabled', false);
+            alert(response.error);
         } else {
             jQuery('#submitButton').prop('disabled', false);
-            callback(serverAnswer);
+            callback(response);
         }
     }).fail(function() {
         jQuery('#submitButton').prop('disabled', false);
@@ -757,23 +761,60 @@ function renderResults(callback, data) {
     });
 }
 
-function updateStatistics(callback, data, redraw) {
+function computeResults(callback, data, init, redraw) {
+    callback = callback === undefined ? function() {} : callback;
+    data = data === undefined ? prepareFormData() : data;
+    init = init === undefined ? true : init;
+    redraw = redraw === undefined ? true : redraw;
+
+    var retCodes = {
+        1: 'An unexpected error occured while initializing environment.',
+        2: 'An unexpected error occured while accessing the database.',
+        3: 'An unexpected error occured while processing the data.'
+    };
+
     jQuery('#submitButton').prop('disabled', true);
     jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/reComputeResults',
+        url: pageInfo.basePath + '/SmartR/' + (init ? 'computeResults' : 'reComputeResults'),
         type: "POST",
         timeout: 1.8e+6,
         data: data
-    }).always(function() {
+    }).done(function(response) {
+        if (response === '0') { // successful
+            if (redraw) {
+                renderResultsInTemplate(callback, data);
+            } else {
+                renderResults(callback, data);
+            }
+        } else {
+            if (init) {
+                jQuery("#outputDIV").html('');
+            }
+            jQuery('#submitButton').prop('disabled', false);
+            alert(retCodes[response]);
+        }
+    }).fail(function(_, __, error){
         if (redraw) {
             renderResultsInTemplate(callback, data);
         } else {
-           renderResults(callback, data); 
+            renderResults(callback, data);
         }
     });
 }
 
-function computeResults() {
+function showLoadingScreen() {
+    jQuery.ajax({
+        url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
+        type: "POST",
+        timeout: 1.8e+6
+    }).done(function(response) {
+        jQuery("#outputDIV").html(response);
+    }).fail(function() {
+        jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
+    });
+}
+
+function runAnalysis() {
     conceptBoxes = [];
     sanityCheckErrors = [];
     register(); // method MUST be implemented by _inFoobarAnalysis.gsp
@@ -784,30 +825,11 @@ function computeResults() {
 
     // if no subset IDs exist compute them
     if(!(isSubsetEmpty(1) || GLOBAL.CurrentSubsetIDs[1]) || !( isSubsetEmpty(2) || GLOBAL.CurrentSubsetIDs[2])) {
-        runAllQueries(computeResults);
+        runAllQueries(runAnalysis);
         return false;
     }
-
-    jQuery('#submitButton').prop('disabled', true);
-    jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/renderLoadingScreen',
-        type: "POST",
-        timeout: 1.8e+6
-    }).done(function(serverAnswer) {
-        jQuery("#outputDIV").html(serverAnswer);
-    }).fail(function() {
-        jQuery("#outputDIV").html("Loading screen could not be initialized. Probably you lost network connection.");
-    });
-
-    var data = prepareFormData();
-    jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/computeResults',
-        type: "POST",
-        timeout: 1.8e+6,
-        data: data
-    }).always(function() {
-        renderResultsInTemplate(function() {}, data);
-    });
+    showLoadingScreen();
+    computeResults();
 }
 
 /**
@@ -820,15 +842,16 @@ function changeInputDIV() {
         type: "POST",
         timeout: 1.8e+6,
         data: {'script': jQuery('#scriptSelect').val()}
-    }).done(function(serverAnswer) {
-        jQuery("#inputDIV").html(serverAnswer);
+    }).done(function(response) {
+        jQuery("#inputDIV").html(response);
+        updateInputView();
     }).fail(function() {
         jQuery("#inputDIV").html("Coult not render input form. Probably you lost network connection.");
     });
 }
 
 function contact() {
-    var version = 0.3;
+    var version = 0.4;
     alert("Before reporting a bug...\n" +
         "... 1. Make sure you use the lastet SmartR version (installed version: " + version + ")\n" +
         "... 2. Make sure that all requirements for using SmartR are met\n" +
