@@ -90,23 +90,22 @@
         }
     }
 
-	var results = ${raw(results)};
-    var probes = results.probes;
-    var geneSymbols = results.geneSymbols;
+	var results = ${results};
+    var uids = results.uids;
     var pValues = results.pValues;
-    var logPs = results.logPs;
+    var negativeLog10PValues = results.negativeLog10PValues;
     var logFCs = results.logFCs;
     var patientIDs = results.patientIDs;
-    var points = jQuery.map(logPs, function(d, i) {
-        return {pValue: pValues[i],
-                logP: logPs[i],
-                logFC: logFCs[i],
-                probe: probes[i],
-                geneSymbol: geneSymbols[i],
-                uid: i
+    var zScoreMatrix = results.zScoreMatrix;
+
+    var points = jQuery.map(negativeLog10PValues, function(d, i) {
+        return {uid: uids[i],
+                pValue: pValues[i],
+                negativeLog10PValues: negativeLog10PValues[i],
+                logFC: logFCs[i]
         };
     });
-    var zScoreMatrix = results.zScoreMatrix;
+
     var margin = {top: 100, right: 100, bottom: 100, left: 100};
     var width = 1200 - margin.left - margin.right;
     var height = 800 - margin.top - margin.bottom;
@@ -130,7 +129,7 @@
     .range([0, width]);
 
     var y = d3.scale.linear()
-    .domain(d3.extent(logPs))
+    .domain(d3.extent(negativeLog10PValues))
     .range([height, 0]);
 
     var xAxis = d3.svg.axis()
@@ -155,13 +154,13 @@
     .attr('x', width / 2)
     .attr('y', height + 40)
     .attr('text-anchor', 'middle')
-    .text('Log2 Fold Change');
+    .text('log2 FC');
 
     volcanoplot.append('text')
     .attr('class', 'axisText')
     .attr('text-anchor', 'middle')
     .attr("transform", "translate(" + (-40) + "," + (height / 2) + ")rotate(-90)")
-    .text('Negative Log10 p-Value');
+    .text('- log10 p');
 
     var tooltip = d3.select('#volcanoplot').append("div")
     .attr("class", "tooltip text")
@@ -241,7 +240,7 @@
 
         d3.selectAll('.point').each(function(d) {
             var point = d3.select(this);
-            if (y(d.logP) >= top && y(d.logP) <= bottom && x(d.logFC) >= left && x(d.logFC) <= right) {
+            if (y(d.negativeLog10PValues) >= top && y(d.negativeLog10PValues) <= bottom && x(d.logFC) >= left && x(d.logFC) <= right) {
                 point
                 .classed('brushed', true);
                 selection.push(d);
@@ -261,10 +260,10 @@
     }
 
     var absLogFCs = jQuery.map(logFCs, function(d) { return Math.abs(d); });
-    var logPsMinMax = d3.extent(logPs);
+    var negativeLog10PValuesMinMax = d3.extent(negativeLog10PValues);
     var logFCsMinMax = d3.extent(absLogFCs);
     var colorScale = d3.scale.quantile()
-    .domain([logPsMinMax[0] * logFCsMinMax[0], logPsMinMax[1] * logFCsMinMax[1]])
+    .domain([negativeLog10PValuesMinMax[0] * logFCsMinMax[0], negativeLog10PValuesMinMax[1] * logFCsMinMax[1]])
     .range(customColorSet());
 
     function redGreen() {
@@ -286,13 +285,13 @@
     .range(redGreen());
 
     function getColor(point) {
-        if (point.logP < oo5p && Math.abs(point.logFC) < 0.5) {
+        if (point.negativeLog10PValues < oo5p && Math.abs(point.logFC) < 0.5) {
             return '#000000';
         }
-        if (point.logP >= oo5p && Math.abs(point.logFC) < 0.5) {
+        if (point.negativeLog10PValues >= oo5p && Math.abs(point.logFC) < 0.5) {
             return '#FF0000';
         }
-        if (point.logP >= oo5p && Math.abs(point.logFC) >= 0.5) {
+        if (point.negativeLog10PValues >= oo5p && Math.abs(point.logFC) >= 0.5) {
             return '#00FF00';
         }
         return '#0000FF';
@@ -309,7 +308,7 @@
         var entry;
         for (var i = 0; i < zScoreMatrix.length; i++) {
             entry = zScoreMatrix[i];
-            if (entry.PROBE === point.probe) {
+            if (entry.uid === point.uid) {
                 break;
             }
         }
@@ -362,8 +361,8 @@
 
     function drawVolcanotable(points) {
         resetVolcanotable();
-        var columns = ["probe", "geneSymbol", "logFC", "logP", 'pValue'];
-        var HEADER = ["ProbeID", 'Genesymbol', "Log2 FC", "-Log10 p", "Real p"];
+        var columns = ["uid", "logFC", "negativeLog10PValues", 'pValue'];
+        var HEADER = ["ID", "log2 FC", "- log10 p", "p"];
         var table = d3.select('#volcanotable').append("table")
         .attr('class', 'mytable');
         var thead = table.append("thead");
@@ -403,20 +402,20 @@
 
         point.enter()
         .append("circle")
-        .attr("class", function(d) { return "point probe-" + d.probe; })
+        .attr("class", function(d) { return "point uid-" + d.uid; })
         .attr("cx", function(d) { return x(d.logFC); })
-        .attr("cy", function(d) { return y(d.logP); })
+        .attr("cy", function(d) { return y(d.negativeLog10PValues); })
         .attr("r", 3)
         .style("fill", function(d) { return getColor(d); })
         .on("mouseover", function(d) {
-            drawMiniHeatmap(d);
-            var html = "- Log10 p-Value: " + d.logP + "<br/>" + "Real p-Value:" + d.pValue + "<br/>" + "Log2FC: " + d.logFC + "<br/>" + "Gene: " + d.geneSymbol + "<br/>" + "ProbeID: " + d.probe;
+            // drawMiniHeatmap(d);
+            var html = "p-value:" + d.pValue + "<br/>" + "-log10 p: " + d.negativeLog10PValues + "<br/>" + "log2FC: " + d.logFC + "<br/>" + "ID: " + d.uid;
 
             tooltip
             .style("visibility", "visible")
             .html(html)
-            .style("left", mouseX() + "px")
-            .style("top", mouseY() + "px");
+            .style("left", mouseX() + 10 + "px")
+            .style("top", mouseY() + 10 + "px");
         })
         .on("mouseout", function(d) {
             resetMiniHeatmap();

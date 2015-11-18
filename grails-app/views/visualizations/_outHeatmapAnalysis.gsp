@@ -198,7 +198,7 @@
         odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
     ];
 
-    var featureColorSetBinary = ['#FFFF00', '#FF8000'];
+    var featureColorSetBinary = ['#FF8000', '#FFFF00'];
     var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
     var gridFieldWidth = 40;
@@ -739,6 +739,41 @@
         .attr('y', function(d, i) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight / 2);
+    }
+
+    function drawTable() {
+        var columns = ["uid", "logFC", "negativeLog10PValues", 'pValue'];
+        var HEADER = ["ID", "log2 FC", "- log10 p", "p"];
+        var table = d3.select('#volcanotable').append("table")
+        .attr('class', 'mytable');
+        var thead = table.append("thead");
+        var tbody = table.append("tbody");
+
+        thead.append("tr")
+        .attr('class', 'mytr')
+        .selectAll("th")
+        .data(HEADER)
+        .enter()
+        .append("th")
+        .attr('class', 'myth')
+        .text(function(d) { return d; });
+
+        var rows = tbody.selectAll("tr")
+        .data(points)
+        .enter()
+        .append("tr")
+        .attr('class', 'mytr');
+
+        var cells = rows.selectAll("td")
+        .data(function(row) {
+            return columns.map(function(column) {
+                return {column: column, value: row[column]};
+            });
+        })
+        .enter()
+        .append("td")
+        .attr('class', 'mytd')
+        .text(function(d) { return d.value; });
     }
 
     function isSorted(arr) {

@@ -12,7 +12,6 @@ class SmartRService {
     def DEBUG = Environment.current == Environment.DEVELOPMENT
     def DEBUG_TMP_DIR = '/tmp/'
     def ENABLE_STATIC_WORKFLOWS = false
-    def UNFINISHED_WORKFLOWS = ['VolcanoAnalysis.R']
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
@@ -27,8 +26,7 @@ class SmartRService {
             def name = it.getName()
             if (name != 'Sample.R'
                     && name[0] != '.'
-                    && (DEBUG || ENABLE_STATIC_WORKFLOWS || ! name.contains('STATIC'))
-                    && (DEBUG || ! (name in UNFINISHED_WORKFLOWS))) {
+                    && (DEBUG || ENABLE_STATIC_WORKFLOWS || ! name.contains('STATIC'))) {
                 scriptList << name
             }
         }
