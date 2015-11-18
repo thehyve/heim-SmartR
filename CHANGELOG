@@ -15,6 +15,7 @@ Current Version 0.4
 - Heatmap Workflow: Fixed a bug which caused additional LDD to be not displayed correctly
 - Heatmap Workflow: Fixed a bug that occured when two LDD nodes had the same name
 - Heatmap Workflow: Fixed a bug which causes the wrong options to display when changing number of subsets
+- Heatmap Workflow: Fixed a bug that caused an error when "Discard features/genes with no identifier/name" was unselected
 - Timeline Workflow: Fixed the correlogram feature after it was broken by 0.3
 - Timeline Workflow: Fixed a bug which occured when the first/last timepoint was not in the zoom range
 - Correlation Workflow: Improved behavior when selecting too few points for statistics
