@@ -104,7 +104,7 @@ class ScriptExecutorService {
         connection.voidEval("""
             require(jsonlite)
             tmp <- '/tmp/tmp.png'
-            png(tmp, width=1000, height=1000)
+            # png(tmp, width=1000, height=1000) // FIXME: This causes problems for some users
             SmartR.settings <- fromJSON(settings)
             SmartR.output <- list()
         """)
@@ -134,16 +134,17 @@ class ScriptExecutorService {
         }
 
         def img = []
-        try { 
-            img = connection.eval("""
-                dev.off()
-                if (file.exists(tmp)) {
-                    image <- readBin(tmp, 'raw', file.info(tmp)[['size']])    
-                }
-                unlink(tmp)
-                image
-            """).asBytes()
-        } catch (all) { }
+//        FIXME: Disabled until it is tested enough
+//        try {
+//            img = connection.eval("""
+//                dev.off()
+//                if (file.exists(tmp)) {
+//                    image <- readBin(tmp, 'raw', file.info(tmp)[['size']])
+//                }
+//                unlink(tmp)
+//                image
+//            """).asBytes()
+//        } catch (all) { }
 
         return [json: json, img: img]
     }
