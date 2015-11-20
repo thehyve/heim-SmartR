@@ -1,6 +1,10 @@
 CHANGELOG
 
-Current Version 0.4
+Current Version 0.4.1
+- Disabled static image feature because some users experienced heavy problems
+- Volcanoplot Workflow: Fixed a bug that caused an error when "Discard features/genes with no identifier/name" was unselected
+
+Version 0.4
 - **SmartR and the eAE merge into one project named eTRIKS Analytics. Please update the datasetExplorer.js entry!**
 - **New Workflow added: Volcanoplots. Additional features will be added in future updates.**
 - New Feature: KEGG pathway analysis for heatmap gene clusters
