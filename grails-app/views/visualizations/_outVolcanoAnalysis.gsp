@@ -227,7 +227,7 @@
     })
     .call(brush);
 
-    function updateSelection(cohort) {
+    function updateSelection() {
         var selection = [];
         d3.selectAll('.point')
         .classed('brushed', false);
@@ -249,22 +249,9 @@
         drawVolcanotable(selection);
     }
 
-    function customColorSet() {
-        var colorSet = [];
-        var NUM = 100;
-        var i = NUM;
-        while(i--) {
-            colorSet.push(d3.rgb(0, (255 * (NUM - i)) / NUM, 0));
-        }
-        return colorSet;
-    }
-
     var absLogFCs = jQuery.map(logFCs, function(d) { return Math.abs(d); });
     var negativeLog10PValuesMinMax = d3.extent(negativeLog10PValues);
     var logFCsMinMax = d3.extent(absLogFCs);
-    var colorScale = d3.scale.quantile()
-    .domain([negativeLog10PValuesMinMax[0] * logFCsMinMax[0], negativeLog10PValuesMinMax[1] * logFCsMinMax[1]])
-    .range(customColorSet());
 
     function redGreen() {
         var colorSet = [];
@@ -361,6 +348,9 @@
 
     function drawVolcanotable(points) {
         resetVolcanotable();
+        if (!points.length) {
+            return;
+        }
         var columns = ["uid", "logFC", "negativeLog10PValues", 'pValue'];
         var HEADER = ["ID", "log2 FC", "- log10 p", "p"];
         var table = d3.select('#volcanotable').append("table")
@@ -418,7 +408,6 @@
             .style("top", mouseY() + 10 + "px");
         })
         .on("mouseout", function(d) {
-            resetMiniHeatmap();
             tooltip.style("visibility", "hidden");
         });
 
