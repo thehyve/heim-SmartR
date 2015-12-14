@@ -35,27 +35,68 @@ library(gplots)
 
 main <- function(phase = NA, projection = NA)
 {
+  input_data <- get_input_data(phase)
+  check_input(input_data, projection)
   
+  data_measurements <- extract_measurements(input_data)
   
-  if(exists("preprocessed"))
+  # for preprocessed data the data from the two different subsets is merged
+  # the summary stats and boxplot functions expect one data.frame per subset per node.
+  # preprocessed data.frame therefore needs to be split
+  if(phase == "preprocess")
   {
-    input_data <- list("preprocessed" = preprocessed)
-  }else
-  {
-    input_data <- loaded_variables
+    data_measurements <- split_on_subsets(data_measurements)
   }
   
-  check_input(input_data, phase, projection)
-  data_measurements <- extract_measurements(input_data)
   summary_stats_json <- produce_summary_stats(data_measurements, phase)
   write_summary_stats(summary_stats_json)
   produce_boxplot(data_measurements, phase, projection)
-  return(list(messages = "Finished successfully")) 
-  }  
   
-#check if provided variables and phase info are in line with expected input as described at top of this script
-check_input <- function(datasets, phase_info, projection)
+  return(list(messages = "Finished successfully")) 
+}  
+
+get_input_data <- function(phase)
 {
+  #check if the phase parameter 
+  if(is.na(phase))
+  {
+    stop("Supply phase parameter to function \'main()\'. Expected input: \'fetch\' or \'preprocess\'")
+  }
+  
+  if(phase != "fetch" & phase != "preprocess" & !is.na(phase))
+  {
+    error_msg <- paste("Incorrect value for phase parameter. Given input: \'", phase, "\'. Expected input: \'fetch\' or \'preprocess\'", sep = "")
+    stop(error_msg)
+  }
+  
+  # for fetch data tab the data from 'loaded_variables' should be used
+  if(phase == "fetch")
+  {
+    if(!exists("loaded_variables"))
+    {
+      stop("Summary stats is run for phase \'fetch\', but variable \'loaded_variables\' does not exist in the environment.")
+    }
+    input_data <- loaded_variables
+  }
+  
+  # for preprocess data tab the data from 'preprocessed' should be used
+  if(phase == "preprocess")
+  {
+    if(!exists("preprocessed"))
+    { 
+      stop("Summary stats is run for phase \'preprocess\', but variable \'preprocessed\' does not exist in the environment.")
+    }
+    input_data <- list("preprocessed" = preprocessed)
+  }
+ 
+  return(input_data)
+}
+  
+
+#check if provided variables and phase info are in line with expected input as described at top of this script
+check_input <- function(datasets, projection)
+{
+  
   #expected input: list of data.frames
   items_list <- sapply(datasets, class)
   if(class(datasets) != "list" | !all(items_list == "data.frame")) #for a data.frame is.list() also returns TRUE. Class returns "data.frame" in that case
@@ -76,17 +117,29 @@ check_input <- function(datasets, phase_info, projection)
                "\ne.g. n0_s1, n0_s2, n1_s1, n1_s2. "))
   }
   
-  
-  if(is.na(phase_info))
+  #all labels of the data.frames should be unique
+  dataset_names <- names(datasets)
+  if(any(duplicated(dataset_names)))
   {
-    stop("Supply phase parameter to function \'main()\'. Expected input: \'fetch\' or \'preprocess\'")
+    stop(paste("Not all data.frame labels are unique; one or more labels in the \'loaded_variables\' or \'preprocessed\' variable are duplicated"))
   }
   
-  if(phase_info != "fetch" & phase_info != "preprocess" & !is.na(phase_info))
+  #check if data.frame "preprocessed" has the right column names
+  # expected format of column names for sample columns is <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1
+  if(dataset_names[1] == "preprocessed") #for preprocessed data there is only 1 data.frame
   {
-    stop("Incorrect value for phase parameter - expected input: either \'fetch\' or \'preprocess\'")
+    column_names <- colnames(datasets$preprocessed)
+    expected_format_names <- ".+_n[[:digit:]]+_s[[:digit:]]+$"
+    names_in_correct_format <- grepl(expected_format_names, column_names)
+    if(!all(names_in_correct_format | column_names == "Row.Label" | column_names == "Bio.marker"))
+    {
+      stop(paste("The column names of the sample columns of the data.frame \'preprocessed\' do not have the expected format.", 
+                "\nExpected column names for the feature columns (probes/genes/proteins/etc): \'Row.Label\' and (optional) \'Bio.marker\' ", 
+                "\nSample columns should adhere to the format: <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1"))
+    }
   }
- 
+  
+
   if(is.na(projection))
   {
     stop("Supply projection parameter to function \'main()\'. Expected input:  \'default_real_projection\' or \'log_intensity\'")
@@ -98,7 +151,59 @@ check_input <- function(datasets, phase_info, projection)
   }
   
   
+
+
+
 }
+
+
+#preprocessed data contains one big data.frame. Summary stats and boxplot should be made per subset, so the dataset gets split on subsets
+split_on_subsets <- function(preprocessed_measurements)
+{
+  preprocessed_measurements <- preprocessed_measurements$preprocessed
+  
+  split_measurements <- list()
+  used_columns <- c()
+  
+  
+  # get possible subset identifiers. Format of column names for sample columns is <sample_name>_n<numerical node id>_s<numerical subset id>, eg. sample234_n1_s1
+  column_names <- colnames(preprocessed_measurements)
+
+  subsets_match_indices <- regexpr("s[[:digit:]]+$", column_names)
+  subsets_matches <- regmatches(x = column_names, m = subsets_match_indices)
+  subset_names <- unique (subsets_matches)
+  
+  if(length(subset_names) == 0)
+  {
+    stop("Something went wrong when splitting the preprocessed dataset into separate datasets per cohort (subset). 
+        Check the format of the column names of variable \'preprocessed\'.
+        Expected format for column labels (of sample columns) of data.frame \'preprocessed\' is:  
+           <sample_name>_n<numerical identifier for the node>_s<numerical identifier for the subset>
+        for example sample23341_n1_s1")
+    
+  }
+  
+  #extract for each subset the corresponding data
+  for(subset_name in subset_names)
+  {
+    subset_columns <- grep(paste(subset_name, "$", sep = ""), column_names) #strict matching to avoid accidental matching (e.g. if sample name contains "s1" as well)
+    
+    item_name <- paste("preprocessed_", subset_name, sep = "")
+    
+    split_measurements[[item_name]] <- preprocessed_measurements[, subset_columns]
+    used_columns <- c(used_columns, subset_columns)
+  }
+  
+  # each column should only be present in one of the two split datasets, and all columns should be present in one or the other split dataset
+  if(any(duplicated(used_columns)) | !all(1:ncol(preprocessed_measurements) %in% used_columns))
+  {
+    stop("Something went wrong when splitting the preprocessed dataset into separate datasets per cohort (subset). 
+        Maybe the column names of variable \'preprocessed\' are not of the correct format?
+        Expected format for column labels of data.frame \'preprocessed\' is <sample_name>_n<numerical identifier for the node>_s<numerical identifier for the subset>, e.g. sample1_n1_s1")
+  }
+  return(split_measurements)
+}
+
 
 
 # Extract the measurement values from the data.frames.
@@ -128,11 +233,12 @@ extract_measurements <- function(datasets)
     {
       non_measurement_columns <- which(colNames %in% c("Row.Label","Bio.marker"))
       datasets[[i]] <- dataset[ , -non_measurement_columns, drop = F]
-      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = class) == "numeric"))
+      if(!all(sapply(dataset[ ,-non_measurement_columns, drop = F], FUN = is.numeric)))
       {
         stop(paste("Correct extraction of data columns was not possible for dataset ",dataset_id, 
                    ". It seems that, aside from the Row.Label and Bio.marker column, there are one or more non numeric data columns in the data.frame.", sep = ""))
       }
+      
     }
   }
   
@@ -151,12 +257,17 @@ extract_measurements <- function(datasets)
 produce_summary_stats <- function(measurement_tables, phase)
 {
   # construct data.frame to store the results from the summary statistics in
-  result_table <- as.data.frame(matrix(NA, length(measurement_tables),12, 
+  result_table <- as.data.frame(matrix(NA, length(measurement_tables),13, 
                                        dimnames = list(names(measurement_tables), 
-                                                       c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "min","max","mean", "standardDeviation", "q1","median","q3"))))
+                                                       c("variableLabel","node","subset","totalNumberOfValuesIncludingMissing", "numberOfMissingValues", "numberOfSamples","min","max","mean", "standardDeviation", "q1","median","q3"))))
+  
   # add information about node and subset identifiers
-  result_table$subset <- gsub(".*_","", rownames(result_table))
-  result_table$node <- gsub("_.*","", rownames(result_table))
+  result_table$subset <- gsub(".*_","", rownames(result_table)) #take everything after _
+  result_table$node <- gsub("_.*","", rownames(result_table)) #take everything before _
+  
+  nodes <-  result_table$node
+  result_table$node[nodes == "preprocessed"] <- "preprocessed_allNodesMerged"
+  
   
   # calculate summary stats per data.frame
   for(i in 1:length(measurement_tables))
@@ -164,6 +275,11 @@ produce_summary_stats <- function(measurement_tables, phase)
     # get the name of the data.frame, identifying the node and subset 
     identifier <- names(measurement_tables)[i]
     result_table[identifier, "variableLabel"] <- identifier
+    
+    if(!all(is.na(measurement_tables[[i]])))
+    {
+      result_table[identifier, "numberOfSamples"]  <- ncol(measurement_tables[[i]])
+    }    
     
     # convert data.frame to a vector containing all values of that data.frame, a vector remains a vector
     measurements <- unlist(measurement_tables[[i]])
@@ -175,6 +291,7 @@ produce_summary_stats <- function(measurement_tables, phase)
     
     # calculate descriptive statistics, only for numerical data. 
     # the 50% quantile is the median. 0 and 100% quartiles are min and max respectively
+   
     result_table[identifier, "mean"] <- mean(measurements, na.rm=T)
     result_table[identifier, "standardDeviation"] <- sd(measurements, na.rm=T)
     
@@ -197,7 +314,8 @@ produce_summary_stats <- function(measurement_tables, phase)
   {
     partial_table <- result_table[which(result_table$node == node), ,drop = F]
     rownames(partial_table) <- 1:nrow(partial_table) #does not influence json result, however is needed for unit testing (matching rownumbers).
-    fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")
+    if(node != "preprocessed_allNodesMerged"){ fileName <- paste(phase,"_summary_stats_node_", node, ".json", sep = "")}
+    if(node == "preprocessed_allNodesMerged"){ fileName <- paste(phase,"_summary_stats_node_all.json", sep = "")}
     summary_stats_all_nodes[[fileName]] <- partial_table
   }
   return(summary_stats_all_nodes)
@@ -218,9 +336,8 @@ write_summary_stats <- function(summary_stats)
 # Function that outputs one box plot image per data node
 produce_boxplot <- function(measurement_tables, phase, projection)
 {
-  #get node and subset identifiers
-  nodes <- gsub("_.*","",names(measurement_tables))
-  subsets <- gsub(".*_","", names(measurement_tables))
+  #get node identifiers
+  nodes <- unique(gsub("_.*","",names(measurement_tables)))
   
   if(projection == "default_real_projection"){ projection <- "intensity"}
   if(projection == "log_intensity"){ projection <- "log2(intensity)"}
@@ -250,13 +367,16 @@ produce_boxplot <- function(measurement_tables, phase, projection)
     single_node_data <- single_node_data[order(names(single_node_data))] 
     
     ## create box plot, output to PNG file
-    fileName <- paste(phase, "_box_plot_node_", node, ".png", sep = "")    
+    if(phase != "preprocess"){fileName <- paste(phase, "_box_plot_node_", node, ".png", sep = "")}   
+    if(phase == "preprocess"){fileName <- paste(phase, "_box_plot_node_all.png", sep = "")}
     png(filename = fileName)
     
     # in case there is data present: create box plot
     if(!all(is.na(single_node_data)))
     {
-      plot_title <- paste("Box plot node", node)
+      if(phase != "preprocess"){plot_title <- paste("Box plot node:", node)}   
+      if(phase == "preprocess"){plot_title <- "Box plot node: preprocessed - all nodes merged"}
+      
       boxplot_results_all_nodes[[fileName]] <- boxplot(single_node_data, col = "grey", show.names = T, ylab = projection, 
                                                        main = plot_title, outline = F, pch = 20, cex=0.2)
     }

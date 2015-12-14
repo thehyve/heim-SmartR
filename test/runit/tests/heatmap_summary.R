@@ -13,6 +13,49 @@ test_set2_measurements <- test_set2[ , c("GSM210004", "GSM210005", "GSM210006", 
 test_data <- list("n0_s1" = test_set)
 test_data_measurements <- list("n0_s1" = test_set_measurements)
 
+test_set_preprocessed  <- test_set
+colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")
+test_set_preprocessed <- cbind(test_set_preprocessed, test_set2_measurements, stringsAsFactors = F)
+colnames(test_set_preprocessed) <- c("Row.Label" , "Bio.marker","GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1",
+                                     "GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")
+### unit tests for function get_input_data ###
+assign("loaded_variables", test_data, envir = .GlobalEnv)
+assign("preprocessed", test_set_preprocessed, envir = .GlobalEnv)
+
+## get_input_data should return value of loaded_variables if phase = "fetch"
+test.get_input_data.fetch <- function(){
+  fetched_data <- get_input_data("fetch")
+  checkEquals(loaded_variables, fetched_data)
+}
+
+## get_input_data should take variable preprocessed and return its contents as a named list if phase = "preprocess"
+test.get_input_data.preprocess <- function(){
+  checkEquals(list("preprocessed" = preprocessed), get_input_data("preprocess"))
+}
+
+## get_input_data should throw error if phase is NA or anything other than "fetch" and "preprocess
+test.get_input_data.phaseNA <- function(){
+  checkException(get_input_data(NA))
+}
+
+test.get_input_data.phaseIncorrect <- function(){
+  checkException(get_input_data("Incorrect_phase"))
+}
+
+## get_input_data should throw error if phase is fetch and loaded_variables does not exist
+test.get_input_data.no_loaded_variables <- function(){
+  rm(loaded_variables, envir = .GlobalEnv)
+  checkException(get_input_data("fetch"))
+  assign("loaded_variables", test_data, envir = .GlobalEnv)
+  
+}
+
+## get_input_data should throw error if phase is preprocess and preprocessed does not exist
+test.get_input_data.noPreprocessed <- function(){
+  rm(preprocessed, envir = .GlobalEnv)
+  checkException(get_input_data("preprocess"))
+  assign("preprocessed", test_data, envir = .GlobalEnv)
+}
 
 
 ### unit tests for function extract_measurements ###
@@ -28,8 +71,14 @@ test.extract_measurements.simplecase2 <- function(){
   checkEquals(test_data_measurements, extract_measurements(test_data_tmp))
 }
 
+#test if it works for preprocessed data
+test.extract_measurements.preprocesseddata <- function(){  
+  checkEquals(list(preprocessed = test_set_preprocessed[,-c(1:2)]), extract_measurements(list(preprocessed = test_set_preprocessed)))
+}
+
+
 #should return a list with a missing value if the data has no "Row.Label" column
-test.extract_measurements.no.Row.Label <- function(){   
+test.extract_measurements.noRowLabel <- function(){   
   tmp <- test_data
   colnames(tmp[[1]])[1] <- "No.Row.Label"
   checkEquals(list("n0_s1"= NA), extract_measurements(tmp))
@@ -74,6 +123,35 @@ test.extract_measurements.1sample1probe <- function(){
   checkEquals(list("n0_s1" = test_set[1,c("GSM210004"), drop = F]), extract_measurements(test_data_one_probe_sample))
 }
 
+### unit tests for function split_on_subsets ###
+
+#should return one data.frame if there is only one subset
+test.split_on_subsets.onesubset <- function(){
+  one_subset_data <- test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")]  
+  preprocessed_measurements <- list(preprocessed = one_subset_data)
+  split_preprocessed_measurements <- list(preprocessed_s1 = one_subset_data)
+  
+  checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
+}
+
+#should return two data.frames if there are two subsets 
+test.split_on_subsets.twosubsets <- function(){
+  preprocessed_measurements <- list(preprocessed = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")])
+  split_preprocessed_measurements <- list(preprocessed_s1 = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210006_n1_s1")],
+                                          preprocessed_s2 = test_set_preprocessed[,c("GSM210005_n0_s2", "GSM210007_n1_s2")])
+  checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
+}
+
+# should also work in case sample name contains '_' 
+test.split_on_subsets.preprocessed_samplename_underscore <- function(){  
+  preprocessed_measurements <- list(preprocessed = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s2", "GSM210006_n1_s1", "GSM210007_n1_s2")])
+  colnames(preprocessed_measurements[[1]]) <- c("sample _ 1_n1_s1", "sample _ 2_n1_s1","sample _ 3_n1_s2","sample _ 4_n1_s2")
+  split_preprocessed_measurements <- list(preprocessed_s1 = preprocessed_measurements[[1]][,c("sample _ 1_n1_s1", "sample _ 2_n1_s1")],
+                                          preprocessed_s2 = preprocessed_measurements[[1]][,c("sample _ 3_n1_s2","sample _ 4_n1_s2")])
+  checkEquals(split_preprocessed_measurements, split_on_subsets(preprocessed_measurements))
+}
+
+
 ### unit tests for function produce_summary_stats ###
 # input is numeric, as output extract_measurements is numeric
 
@@ -86,6 +164,7 @@ summary_stats_table <- data.frame(
   "subset" = "s1",
   "totalNumberOfValuesIncludingMissing" = 20,
   "numberOfMissingValues" = 1,
+  "numberOfSamples" = 4,
   "min" = -23.0234,
   "max" = 367.436,
   "mean" = 75.242316,
@@ -120,6 +199,19 @@ test.produce_summary_stats.multiplenodesandsubsets <- function(){
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result_n0, "fetch_summary_stats_node_n1.json" = expected_result_n1), produce_summary_stats(test_data_measurements_multiple_nodes_subsets, phase))
 }
 
+# preprocessed data
+test.produce_summary_stats.preprocessed <- function(){  
+  split_preprocessed_measurements <- list(preprocessed_s1 = test_set_preprocessed[,c("GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")],
+                                          preprocessed_s2 = test_set_preprocessed[,c("GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")])
+  expected_result<-  rbind(summary_stats_table,summary_stats_table2 )
+  expected_result[1 , c("variableLabel","subset", "node")] <-  c("preprocessed_s1", "s1", "preprocessed_allNodesMerged")
+  expected_result[2 , c("variableLabel","subset", "node")] <-  c("preprocessed_s2", "s2", "preprocessed_allNodesMerged")
+  
+  checkEquals(list("preprocess_summary_stats_node_all.json" = expected_result), produce_summary_stats(split_preprocessed_measurements, "preprocess"))
+}
+
+
+
 
 # what if list item = NA
 test.produce_summary_stats.itemNA <- function(){  
@@ -127,7 +219,8 @@ test.produce_summary_stats.itemNA <- function(){
   
   expected_result <- summary_stats_table
   expected_result[,c("totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(1,1)
-  expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- as.numeric(NA)
+  expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- as.numeric(NA) #numeric
+  expected_result[,"numberOfSamples"] <- NA #logical
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_NA_set, phase))
 }
@@ -136,7 +229,7 @@ test.produce_summary_stats.itemNA <- function(){
 test.produce_summary_stats.1sample<- function(){  
   test_data_one_sample <- list("n0_s1" = data.frame(sample = 1:5 ))
   expected_result <- summary_stats_table
-  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(5, 0)
+  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues","numberOfSamples")] <- c(5, 0, 1)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_sample, phase))
@@ -147,7 +240,7 @@ test.produce_summary_stats.1probe <- function(){
   test_data_one_probe <- list("n0_s1" = test_data_one_probe)
   
   expected_result <- summary_stats_table
-  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(5, 0)
+  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues","numberOfSamples")] <- c(5, 0, 5)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 5, 3, 1.58113883, 2, 3, 4)
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe, phase))
@@ -157,7 +250,7 @@ test.produce_summary_stats.1probe <- function(){
 test.produce_summary_stats.1probe1sample <- function(){
   test_data_one_probe_sample <- list("n0_s1" = data.frame(sample = 1))
   expected_result <- summary_stats_table
-  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues")] <- c(1, 0)
+  expected_result[,c( "totalNumberOfValuesIncludingMissing", "numberOfMissingValues","numberOfSamples")] <- c(1, 0, 1)
   expected_result[,c("min", "max", "mean", "standardDeviation", "q1", "median", "q3")] <- c(1, 1, 1, as.numeric(NA), 1, 1, 1)
   
   checkEquals(list("fetch_summary_stats_node_n0.json" = expected_result), produce_summary_stats(test_data_one_probe_sample, phase))
@@ -185,7 +278,7 @@ boxplot_table_2 <-list(
   group = 1,
   names = "s1")
 
-# boxplot output corresponding to 1 node with two subsets, each containing the data from test_set
+# boxplot output corresponding to 1 node with two subsets, each subset containing the data from test_set
 boxplot_table_2subsets <- list(
   stats = matrix(c(-23.02340, 4.45714, 35.58670, 123.11850, 185.84100),5,2, byrow = F),
   n = c(19, 19),
@@ -194,7 +287,7 @@ boxplot_table_2subsets <- list(
   group = c(1, 2),
   names = c("s1", "s2"))
 
-# boxplot output corresponding to 1 node with two subsets, the first containing the data from test_set and the second from test_set2
+# boxplot output corresponding to 1 node with two subsets, the first subset containing the data from test_set and the second from test_set2
 boxplot_table_2subsets2 <- list(
   stats = matrix(c(-23.02340, 4.45714, 35.58670, 123.11850, 185.84100, -22.02340, 5.45714, 36.58670, 124.11850, 186.84100),5,2, byrow = F),
   n = c(19, 19),
@@ -205,7 +298,7 @@ boxplot_table_2subsets2 <- list(
 
 # 1 node, 1 subset
 test.produce_boxplot.simplecase <- function(){  
-  checkEquals(list("fetch_box_plot_node_n0.png" = boxplot_table), produce_boxplot(test_data_measurements, phase, "log2"))
+  checkEquals(list("fetch_box_plot_node_n0.png" = boxplot_table), produce_boxplot(test_data_measurements, phase, "log_intensity"))
 }
 
 
@@ -213,15 +306,23 @@ test.produce_boxplot.simplecase <- function(){
 #multiple nodes, multiple subsets
 test.produce_boxplot.multiplenodesandsubsets <- function(){  
   test_data_measurements_multiple_nodes_subsets <- list("n0_s1" = test_set_measurements,"n0_s2" = test_set2_measurements,"n1_s1" = test_set_measurements, "n1_s2" = test_set_measurements)
-  checkEquals(list("fetch_box_plot_node_n0.png" = boxplot_table_2subsets2, "fetch_box_plot_node_n1.png" = boxplot_table_2subsets), produce_boxplot(test_data_measurements_multiple_nodes_subsets, phase, "log2"))
+  checkEquals(list("fetch_box_plot_node_n0.png" = boxplot_table_2subsets2, "fetch_box_plot_node_n1.png" = boxplot_table_2subsets), produce_boxplot(test_data_measurements_multiple_nodes_subsets, phase, "log_intensity"))
 }
 
+#preprocessed data
+test.produce_boxplot.preprocessed <- function(){  
+  split_preprocessed_measurements <- list(preprocessed_s1 = test_set_preprocessed[, c("GSM210004_n0_s1", "GSM210005_n0_s1", "GSM210006_n1_s1", "GSM210007_n1_s1")],
+                                          preprocessed_s2 = test_set_preprocessed[, c("GSM210004_n0_s2", "GSM210005_n0_s2", "GSM210006_n1_s2", "GSM210007_n1_s2")])
+  expected_result<- list("preprocess_box_plot_node_all.png" = boxplot_table_2subsets2)
+  names(expected_result$preprocess_box_plot_node_all.png$out)<- c( "GSM210007_n1_s11", "GSM210007_n1_s21") 
+  checkEquals(expected_result, produce_boxplot(split_preprocessed_measurements, "preprocess", "log_intensity"))
+}
 
 # what if list item = NA
 test.produce_boxplot.itemNA <- function(){  
   test_NA_set <- list("n0_s1" = NA)
   expected_result <- "No data points to plot"
-  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_NA_set, phase,"log2"))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_NA_set, phase,"log_intensity"))
 }
 
 # what if number of samples = 1 , or number of genes = 1?
@@ -229,7 +330,7 @@ test.produce_boxplot.1sample <- function(){
   test_data_one_sample <- list("n0_s1" = data.frame(sample = unlist(test_data_measurements) )) #make a data.frame with only one column that contains all the measurements of the test_set, but now in one column. statistics then remain the same
   expected_result <- boxplot_table
   names(expected_result$out) <- "sample16"
-  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_sample, phase, "log2"))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_sample, phase, "log_intensity"))
 }
 
 test.produce_boxplot.1probe <- function(){            
@@ -238,7 +339,7 @@ test.produce_boxplot.1probe <- function(){
     )) #make a data.frame with only one row that contains all the measurements of the test_set, but now in one row. statistics then remain the same
   expected_result <- boxplot_table
   names(expected_result$out) <- "p"
-  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe, phase, "log2"))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe, phase, "log_intensity"))
 }
 
 #1 probe, 1 sample
@@ -251,5 +352,5 @@ test.produce_boxplot.1probe1sample <- function(){
     out = as.numeric(NULL),
     group = as.numeric(NULL),
     names = "s1")
-  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe_sample, phase, "log2"))
+  checkEquals(list("fetch_box_plot_node_n0.png" = expected_result), produce_boxplot(test_data_one_probe_sample, phase, "log_intensity"))
 }
