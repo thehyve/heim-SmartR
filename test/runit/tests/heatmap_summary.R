@@ -2,8 +2,12 @@ source("web-app/HeimScripts/heatmap/summary.R")
 
 
 ### main test data ###
-test_set <- data.frame(Row.Label = c("1007_s_at", "1053_at", "117_at", "121_at", "1255_g_at"), Bio.marker = letters[1:5], GSM210004 = c(179.26, NA, 0, 0.00734, -23.0234), 
-                       GSM210005 = c(185.841, 42.2334, 16.7999, 64.5686, 3.82495), GSM210006 = c(179.15, 35.5867, 33.9371, 105.912, 1.15958), GSM210007 = c(367.436, 60.1003, 31.3962, 140.325, 5.08933), stringsAsFactors = F)
+test_set <- data.frame(Row.Label = c("1007_s_at", "1053_at", "117_at", "121_at", "1255_g_at"),
+                       Bio.marker = letters[1:5], GSM210004 = c(179.26, NA, 0, 0.00734, -23.0234),
+                       GSM210005 = c(185.841, 42.2334, 16.7999, 64.5686, 3.82495),
+                       GSM210006 = c(179.15, 35.5867, 33.9371, 105.912, 1.15958),
+                       GSM210007 = c(367.436, 60.1003, 31.3962, 140.325, 5.08933),
+                       stringsAsFactors = F)
 test_set_measurements <- test_set[ , c("GSM210004", "GSM210005", "GSM210006", "GSM210007")]
 
 test_set2 <- test_set
