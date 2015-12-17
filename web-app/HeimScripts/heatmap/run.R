@@ -8,7 +8,6 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   max_rows <- as.numeric(max_rows)
   verifyInput(max_rows, sorting)
   df <- parseInput()
-  df[is.na(df)] <- 0  # All NAs to zero.
   df["Row.Label"] <-
     lapply(df["Row.Label"],fixString)  # remove illegal
                                        # characters from probe names. This will
@@ -65,7 +64,7 @@ main <- function(max_rows = 100, sorting = "nodes", ranking = "coef") {
   list(messages = msgs)
 }
 
-writeMarkerTable <- function(markerTable){
+writeMarkerTable <- function(markerTable) {
   colnames(markerTable) <- c("rowLabel", "biomarker",
                              "log2FoldChange", "t", "pValue", "adjustedPValue", "B")
   jsn                   <- toJSON(markerTable, pretty = TRUE)
@@ -285,7 +284,7 @@ discardNodeAndSubject <- function(label) {
 
 buildFields <- function(df) {
   df <- melt(
-    df, na.rm = T, id = c("Row.Label",
+    df,  id = c("Row.Label",
                           "Bio.marker",
                           "SIGNIFICANCE",
                           "MEAN",
@@ -301,6 +300,7 @@ buildFields <- function(df) {
   names(df)   <-
     c("PROBE","GENESYMBOL","SIGNIFICANCE","PATIENTID","VALUE")
   df["ZSCORE"] <- ZSCORE
+  #df[ is.na(df) ] <- 0  # All NAs to zero. Only for purpose of JSON
   return(df)
 }
 
@@ -450,6 +450,7 @@ dendrogramToJSON <- function(d) {
 
 
 addClusteringOutput <- function(jsn, measurements) {
+  measurements[ is.na(measurements) ] <- 0  # All NAs to zero. Only for purpose of clustering
   euclideanDistancesRow <- dist(measurements, method = "euclidean")
   manhattanDistancesRow <- dist(measurements, method = "manhattan")
   euclideanDistancesCol <- dist(t(measurements), method = "euclidean")
