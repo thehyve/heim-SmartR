@@ -40,8 +40,7 @@
 			selection = '#significanceMeassure_pairCohort';
 		}
 	}
-	updateOnView();
-	
+
 	activateDragAndDrop('mRNAData');
 	activateDragAndDrop('additionalFeatures_numerical');
 	activateDragAndDrop('additionalFeatures_alphabetical');
