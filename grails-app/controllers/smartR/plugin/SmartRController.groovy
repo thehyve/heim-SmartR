@@ -94,8 +94,7 @@ class SmartRController {
 
         // list of required javascript files
         def scripts = [
-                servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js',
-                servletContext.contextPath + pluginContextPath + '/js/etriksEngines/engineSelection.js',
+                servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js'
         ]
 
         // list of required css files
