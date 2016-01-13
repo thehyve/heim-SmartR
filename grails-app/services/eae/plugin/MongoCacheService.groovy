@@ -8,8 +8,9 @@ import grails.transaction.Transactional
 import groovy.json.JsonSlurper
 import mongo.MongoCacheFactory
 import org.bson.Document
-import org.json.JSONArray
-import org.json.JSONObject
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 
 @Transactional
 class MongoCacheService {

@@ -3,7 +3,8 @@ package eae.plugin
 import com.mongodb.BasicDBObject
 import grails.util.Environment
 import org.apache.commons.io.FilenameUtils
-import org.json.JSONObject
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 
 class EaeController {
 
