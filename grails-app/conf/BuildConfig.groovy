@@ -64,6 +64,10 @@ grails.project.dependency.resolution = {
             transitive = false /* don't bring groovy-all */
             export     = false
         }
+        // Taken from original smartR
+        // ==========================
+        // compile 'org.mongodb:mongo-java-driver:3.0.4'
+        // compile 'org.apache.oozie:oozie-client:4.2.0'
     }
     plugins {
         runtime ':resources:1.2.1'

@@ -4,18 +4,34 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import grails.util.Holders
 import grails.util.Environment
+import groovy.io.FileType
 
 
 class SmartRService {
 
     def DEBUG = Environment.current == Environment.DEVELOPMENT
     def DEBUG_TMP_DIR = '/tmp/'
+    def ENABLE_STATIC_WORKFLOWS = false
 
     def grailsApplication = Holders.grailsApplication
     def springSecurityService
     def i2b2HelperService
     def dataQueryService
     def scriptExecutorService
+
+    def getScriptList() {
+        def dir = getWebAppFolder() + 'Scripts/smartR/'
+        def scriptList = []
+        new File(dir).eachFile {
+            def name = it.getName()
+            if (name != 'Sample.R'
+                    && name[0] != '.'
+                    && (DEBUG || ENABLE_STATIC_WORKFLOWS || ! name.contains('STATIC'))) {
+                scriptList << name
+            }
+        }
+        return scriptList
+    }
 
     def queryData(parameterMap) {
         def data_cohort1 = [:]
@@ -89,7 +105,7 @@ class SmartRService {
             return grailsApplication
                 .mainContext
                 .servletContext
-                .getRealPath('/plugins/') + '/smart-r-0.3/'
+                .getRealPath('/plugins/') + '/smart-r-0.4/'
         }
     }
 
@@ -97,9 +113,9 @@ class SmartRService {
         def parameterMap = [:]
         parameterMap['init'] = params.init.toBoolean()
         parameterMap['script'] = params.script
-        parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/'
-        parameterMap['result_instance_id1'] = params.result_instance_id1
-        parameterMap['result_instance_id2'] = params.result_instance_id2
+        parameterMap['scriptDir'] = getWebAppFolder() + '/Scripts/smartR/'
+        parameterMap['result_instance_id1'] = params.int('result_instance_id1')
+        parameterMap['result_instance_id2'] = params.int('result_instance_id2')
         parameterMap['settings'] = params.settings
         parameterMap['conceptBoxes'] = new JsonSlurper().parseText(params.conceptBoxes)
         parameterMap['cookieID'] = params.cookieID
@@ -108,12 +124,35 @@ class SmartRService {
     }
 
     def runScript(params) {
-        def parameterMap = createParameterMap(params)
+        def parameterMap
 
-        if (parameterMap['init']) {
-            parameterMap = queryData(parameterMap)
+        try {
+            parameterMap = createParameterMap(params)
+            // we clear the session here already because a network timeout during the new DB query can cause the resycling of the previous workflow
+            if (parameterMap['init']) {
+                scriptExecutorService.clearSession(parameterMap['cookieID'])
+            }
+        } catch (e) {
+            print e
+            return 1
         }
 
-        scriptExecutorService.run(parameterMap)
+        try {
+            if (parameterMap['init']) {
+                parameterMap = queryData(parameterMap)
+            }
+        } catch (e) {
+            print e
+            return 2
+        }
+
+        try {
+            scriptExecutorService.run(parameterMap)
+        } catch(e) {
+            print e
+            return 3
+        }
+
+        return 0
     }
 }
