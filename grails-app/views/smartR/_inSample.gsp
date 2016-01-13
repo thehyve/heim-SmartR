@@ -29,4 +29,9 @@
 		// sometimes one needs more sophisticated sanity checks (see boxplot)
 		return true;
 	}
+
+	// OPTIONAL: Executed every time the tab is selected. Useful for on-the-fly input form updates if subset selection changes
+	function updateOnView() {
+		something();
+	}
 </script>

@@ -11,6 +11,10 @@
         stroke-width: 0;
     }
 
+    .square:hover {
+        cursor: pointer;
+    }
+
     .extraSquare {
         stroke: white;
         stroke-width: 0;
@@ -194,7 +198,7 @@
         odd([[0, 0, 1], [1, 1, 0], [1, 0, 0]])
     ];
 
-    var featureColorSetBinary = ['#FFFF00', '#FF8000'];
+    var featureColorSetBinary = ['#FF8000', '#FFFF00'];
     var featureColorSetSequential = ['rgb(247,252,253)','rgb(224,236,244)','rgb(191,211,230)','rgb(158,188,218)','rgb(140,150,198)','rgb(140,107,177)','rgb(136,65,157)','rgb(129,15,124)','rgb(77,0,75)'];
 
     var gridFieldWidth = 40;
@@ -674,14 +678,7 @@
         .attr("transform", function(d) { return "translate(" + (width + 2 + 0.5 * gridFieldWidth) + ",0)" + "translate(0," + (featurePosY + features.indexOf(d) * gridFieldHeight / 2 + gridFieldHeight / 4) + ")rotate(-90)";})
         .attr('dy', '0.35em')
         .attr("text-anchor", "middle")
-        .text('↑↓')
-        .attr('visibility', function(d) {
-            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
-                return 'visible';
-            } else {
-                return 'hidden';
-            }
-        });
+        .text('↑↓');
 
         featureSortText
         .transition()
@@ -700,39 +697,38 @@
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight / 2)
         .on("click", function(feature) {
-            var featureValue = [];
+            var featureValues = [];
             var missingValues = false;
             for(var i = 0; i < patientIDs.length; i++) {
                 var patientID = patientIDs[i];
-                var zScore = - Math.pow(2,32);
+                var value = (- Math.pow(2,32)).toString();
                 try {
                     var square = d3.select('.extraSquare' + '.patientID-' + patientID + '.feature-' + feature);
-                    zScore = square.property('__data__').ZSCORE;
+                    value = square.property('__data__').VALUE;
                 } catch (err) {
                     missingValues = true;
                 }
-                featureValue.push([i, zScore]);
+                featureValues.push([i, value]);
             }
-            if (isSorted(featureValue)) {
-               featureValue.sort(function(a, b) { return a[1] - b[1]; });
+            if (isSorted(featureValues)) {
+                featureValues.sort(function(a, b) {
+                    var diff = a[1] - b[1];
+                    return isNaN(diff) ? a[1].localeCompare(b[1]) : diff;
+                });
             } else {
-               featureValue.sort(function(a, b) { return b[1] - a[1]; });
+               featureValues.sort(function(a, b) {
+                    var diff = b[1] - a[1];
+                    return isNaN(diff) ? b[1].localeCompare(a[1]) : diff;
+                });
             }
             var sortValues = [];
-            for (i = 0; i < featureValue.length; i++) {
-                sortValues.push(featureValue[i][0]);
+            for (i = 0; i < featureValues.length; i++) {
+                sortValues.push(featureValues[i][0]);
             }
             if (missingValues) {
                 alert('Feature is missing for one or more patients.\nEvery missing value will be set to lowest possible value for sorting;');
             }
             updateColOrder(sortValues);
-        })
-        .attr('visibility', function(d) {
-            if (d3.select('.extraSquare.feature-' + d).property('__data__').TYPE === 'numerical') {
-                return 'visible';
-            } else {
-                return 'hidden';
-            }
         });
 
 
@@ -743,6 +739,54 @@
         .attr('y', function(d, i) { return featurePosY + features.indexOf(d) * gridFieldHeight / 2; })
         .attr('width', gridFieldWidth)
         .attr('height', gridFieldHeight / 2);
+    }
+
+    function drawTable() {
+        var columns = ["uid", "logFC", "negativeLog10PValues", 'pValue'];
+        var HEADER = ["ID", "log2 FC", "- log10 p", "p"];
+        var table = d3.select('#volcanotable').append("table")
+        .attr('class', 'mytable');
+        var thead = table.append("thead");
+        var tbody = table.append("tbody");
+
+        thead.append("tr")
+        .attr('class', 'mytr')
+        .selectAll("th")
+        .data(HEADER)
+        .enter()
+        .append("th")
+        .attr('class', 'myth')
+        .text(function(d) { return d; });
+
+        var rows = tbody.selectAll("tr")
+        .data(points)
+        .enter()
+        .append("tr")
+        .attr('class', 'mytr');
+
+        var cells = rows.selectAll("td")
+        .data(function(row) {
+            return columns.map(function(column) {
+                return {column: column, value: row[column]};
+            });
+        })
+        .enter()
+        .append("td")
+        .attr('class', 'mytd')
+        .text(function(d) { return d.value; });
+    }
+
+    function isSorted(arr) {
+        var sorted = true;
+        for (var i = 0, len = arr.length - 1; i < len; i++) {
+            var diff = arr[i][1] - arr[i+1][1];
+            diff = isNaN(diff) ? arr[i][1].localeCompare(arr[i+1][1]) : diff;
+            if (diff < 0) {
+                sorted = false;
+                break;
+            }
+        }
+        return sorted;
     }
 
     function zoom(zoomLevel) {
@@ -967,32 +1011,35 @@
         .attr("transform", function (d) {
             return "translate(" + (width + spacing + h - d.y) + "," + d.x + ")";
         }).on('click', function(d) {
-            alert('Under Construction.');
-            return;
             var leafs = d.index.split(' ');
             var genes = [];
             for (var i = 0; i < leafs.length; i++) {
-                var gene = geneSymbols[leafs[i]];
+                var uid = uids[leafs[i]];
+                var split = uid.split("--");
+                var gene = split[split.length - 1];
                 genes.push(gene);
             }
+            var geneList = genes.join(" ");
             jQuery.ajax({
                 url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
                 type: "POST",
-                timeout: '600000',
+                timeout: '10000',
+                async: false,
                 data: {
-                    section: 'upload_gene_lists',
-                    primary_org: 'Human',
+                    section: 'upload_gene_lists_general',
+                    primary_org: 'human',
                     background: 'whole_genome',
-                    Category1: 'Human',
+                    Category1: 'human',
                     gene_list_1: 'gene_list_1',
-                    SubCat1: 'ascii',
-                    attachment1: genes
+                    SubCat1: 'hgnc_symbol',
+                    attachment1: geneList
                 }
             }).done(function(serverAnswer) {
-                var newTab = window.open('', '');
-                newTab.document.write(serverAnswer);
+                var sessionID = serverAnswer.match(/tmp_\d+/)[0];
+                var url = "http://biocompendium.embl.de/cgi-bin/biocompendium.cgi?section=pathway&pos=0&background=whole_genome&session=" + sessionID + "&list=gene_list_1__1&list_size=15&org=human";
+                window.open(url);
             }).fail(function() {
-                alert('fail');
+                alert('An error occured. Maybe the external resource is unavailable.');
             });
         })
         .on("mouseover", function(d) {
@@ -1097,12 +1144,12 @@
         var data = prepareFormData();
         data = addSettingsToData(data, { maxRows: maxRows });
 
-        var doOnResponse = function() {
+        var onResponse = function() {
             loadFeatureButton.select('text').text('Load 100 additional rows');
             cuttoffButton.select('text').text('Apply Cutoff');
         };
 
-        updateStatistics(doOnResponse, data, true);
+        computeResults(onResponse, data, false, true);
     }
 
     function init() {

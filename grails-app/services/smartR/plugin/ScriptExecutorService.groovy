@@ -94,8 +94,8 @@ class ScriptExecutorService {
 
         connection.voidEval("""
             require(jsonlite)
-            data.cohort1 <- fromJSON(data_cohort1)
-            data.cohort2 <- fromJSON(data_cohort2)
+            SmartR.data.cohort1 <- fromJSON(data_cohort1)
+            SmartR.data.cohort2 <- fromJSON(data_cohort2)
         """)
     }
 
@@ -103,8 +103,10 @@ class ScriptExecutorService {
         connection.assign("settings", parameterMap['settings'].toString())
         connection.voidEval("""
             require(jsonlite)
-            settings <- fromJSON(settings)
-            output <- list()
+            tmp <- '/tmp/tmp.png'
+            # png(tmp, width=1000, height=1000) // FIXME: This causes problems for some users
+            SmartR.settings <- fromJSON(settings)
+            SmartR.output <- list()
         """)
     }
 
@@ -116,7 +118,7 @@ class ScriptExecutorService {
 
     def computeResults(connection) {
         connection.voidEval("""
-            json <- toString(toJSON(output, digits=5))
+            json <- toString(toJSON(SmartR.output, digits=5))
             start <- 1
             stop <- ${R_CHUNK_SIZE}
         """)
@@ -130,7 +132,21 @@ class ScriptExecutorService {
         """).asString()) {
             json += chunk
         }
-        return json
+
+        def img = []
+//        FIXME: Disabled until it is tested enough
+//        try {
+//            img = connection.eval("""
+//                dev.off()
+//                if (file.exists(tmp)) {
+//                    image <- readBin(tmp, 'raw', file.info(tmp)[['size']])
+//                }
+//                unlink(tmp)
+//                image
+//            """).asBytes()
+//        } catch (all) { }
+
+        return [json: json, img: img]
     }
 
     def run(parameterMap) {
@@ -140,7 +156,6 @@ class ScriptExecutorService {
         if (! connection) {
             sessions[id].success = false
             sessions[id].results = 'Rserve refused the connection! Is it running?'
-            print sessions
             return
         }
 
