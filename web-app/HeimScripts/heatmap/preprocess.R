@@ -7,7 +7,7 @@ library("WGCNA")
 main <- function(aggregate=FALSE){
   msgs = c("")
   df <- mergeFetchedData(loaded_variables)
-  good.input <- ncol(df) > 3 && nrow(df) > 0 && sum(df$Bio.marker != "") > 0 # more than one sample, contains any rows, non empty Bio.marker column.
+  good.input <- ncol(df) > 3 && nrow(df) > 1 && sum(df$Bio.marker != "") > 0 # more than one sample, contains any rows, non empty Bio.marker column.
   if(aggregate && good.input){
     df <- dropEmptyGene(df)
     aggr  <- aggregate.probes(df)
