@@ -16,4 +16,10 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'heatmapValidator.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'heatmapView.js']
     }
+
+    smartR_correlation {
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartRService.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'smartRView.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR', file: 'correlationView.js']
+    }
 }
