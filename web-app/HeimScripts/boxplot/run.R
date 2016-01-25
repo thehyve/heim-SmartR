@@ -1,13 +1,13 @@
 
 
-main <- function() {
-  excludedPatientIDs <- c("")
-  datapoints <- loaded_variables[[1]]
-  print(datapoints)
+main <- function(mapping = list(), excludedPatientIDs = c("")) {
+  datapoints <- loaded_variables[[2]]
   data <- list()
   points <- datapoints[,1:2]  #[c('patientID', 'value')]
-  names(points) <- c('patientID', 'value')
-  subsets <- list() 
+  colnames(points) <- c('patientID', 'value')
+  subsets <-  loaded_variables[[1]]  #list()
+  colnames(subsets) <- c('patientID', 'value')
+  subsets <- dropEmpty(subsets)
   patientIDs <- points$patientID
   concept <- "Concept name"#names(loaded_variables)[1]  #  datapoints$concept[1]
   data$concept <- concept
@@ -50,4 +50,8 @@ main <- function() {
   data$subsets <- nonEmptySubsets
   dfOut <- list(cohort1 = data)
   list(jsn = toJSON(dfOut, pretty=TRUE) )
+}
+
+dropEmpty <- function(df) {
+  df[df$value != "",]
 }

@@ -45,9 +45,11 @@ var _createAnalysisConstraints = function (params) {
 };
 
 var _getFetchDataViewValues = function () {
-    var _conceptPath = extJSHelper.readConceptVariables(jQuery('#concept1').attr('id'));
+    var _conceptPath1 = extJSHelper.readConceptVariables(jQuery('#concept1').attr('id'));
+    var _subsetsPath1 = extJSHelper.readConceptVariables(jQuery('#subsets1').attr('id'));
+    var _conceptPaths = _conceptPath1 +'|'+ _subsetsPath1;
     return {
-        conceptPaths: _conceptPath,
+        conceptPaths: _conceptPaths,
         // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
         resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; })
     };
