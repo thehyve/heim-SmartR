@@ -1,6 +1,7 @@
 var sessionId = '';
 var executionId = '';
 var _JSON = {};
+var mapping = {};
 
 var _generateLabels = (function() {
     function throwIfDuplicates(arr) {
@@ -19,7 +20,9 @@ var _generateLabels = (function() {
 
         var n = 0;
         return arr.reduce(function(result, currentItem) {
-            result['n' + n++] = currentItem;
+            var label = 'n' + n++;
+            result[label] = currentItem;
+            mapping[currentItem] = label;
             return result;
         }, {});
     };
@@ -45,9 +48,15 @@ var _createAnalysisConstraints = function (params) {
 };
 
 var _getFetchDataViewValues = function () {
-    var _conceptPath = extJSHelper.readConceptVariables(jQuery('#concept1').attr('id'));
+    var _conceptPath1 = extJSHelper.readConceptVariables(jQuery('#concept1').attr('id'));
+    var _subsetsPath1 = extJSHelper.readConceptVariables(jQuery('#subsets1').attr('id'));
+    var _conceptPaths = _conceptPath1 ;
+    if (_subsetsPath1){
+        _conceptPaths +=    "|" + _subsetsPath1 ;
+    }
+    mapping['numeric'] = _conceptPath1;
     return {
-        conceptPaths: _conceptPath,
+        conceptPaths: _conceptPaths,
         // CurrentSubsetIDs can contain undefined and null. Pass only nulls forward
         resultInstanceIds : GLOBAL.CurrentSubsetIDs.map(function (v) { return v || null; })
     };
@@ -73,19 +82,16 @@ var runTask = function(arguments, taskType, workflow, doneCallback) {
 };
 
 var runAnalysis = function() {
-    var _arguments = {};
+    var _arguments = {mapping: mapping
+    };
   runTask(_arguments,'run','boxplot', checkAnalysisStatus);
 };
 
 var checkAnalysisStatus = function() {
-    console.log('in check Analysis status');
     statusPoller(makeVisualization);
 };
 
 var makeVisualization = function() {
-   console.log('spagetti works');
-    console.log('Inside spagetti, ');
-    console.log(_JSON);
    visualization(_JSON);
 };
 
@@ -164,11 +170,8 @@ var visualization = function(json) {
             animationDuration = tmpAnimationDuration;
         }
     }
-    console.log('in visualization');
     var results = JSON.parse(json);
     results.cohort2 = results.cohort2 === undefined ? {concept: 'undefined', subsets: []} : results.cohort2;
-    console.log('XXXXXXXXX');
-    console.log(results.cohort1);
     var margin = {top: 10, right: 60, bottom: 200, left: 60};
     var width = 600//$("#smartRPanel").width() / 2 - 200 - margin.left - margin.right;
     var height = 500//$("#smartRPanel").height() * 0.65 - margin.top - margin.bottom;

@@ -137,37 +137,21 @@
 			<input type="button" class='txt' onclick="clearVarSelection('subsets1')" value="Clear Window">
 		</td>
 	</tr>
-	<tr>
-		<td style='padding-right: 2em; padding-bottom: 1em'>
-			<mark>Step 3:</mark> Drop exactly one numerical node into this window.<br/>
-			NOTE: This window maps to the second cohort!<br/>
-			(Example: Age, Pulse, Blood Pressure)<br/>
-			<div id='concept2' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('concept2')" value="Clear Window">
-		</td>
-		<td style='padding-right: 2em; padding-bottom: 1em'>
-			<mark>Step 4 (optional):</mark> Drop any number of concepts subsetting the choice made on the left into this window.<br/>
-			NOTE: This window maps to the second cohort!<br/>
-			(Example: Demographics/Male, Demographics/Female)<br/>
-			<div id='subsets2' class="queryGroupIncludeSmall"></div>
-			<input type="button" class='txt' onclick="clearVarSelection('subsets2')" value="Clear Window">
-		</td>
-	</tr>
 </table>
 
 <input id="submitButton" class='txt' type="button" value="(Re-)Run Analysis" onclick="runBoxplot()"/>
 <div id="boxplot-d3"></div>
 <script>
 	activateDragAndDrop('concept1');
-	activateDragAndDrop('concept2');
+	//activateDragAndDrop('concept2');
 	activateDragAndDrop('subsets1');
-	activateDragAndDrop('subsets2');
+	//activateDragAndDrop('subsets2');
 
 	function register() {
 		registerConceptBox('concept1', [1], 'valueicon', 1, 1);
-		registerConceptBox('concept2', [2], 'valueicon', 0, 1);
+		//registerConceptBox('concept2', [2], 'valueicon', 0, 1);
 		registerConceptBox('subsets1', [1], 'alphaicon', 0, undefined);
-		registerConceptBox('subsets2', [2], 'alphaicon', 0, undefined);
+		//registerConceptBox('subsets2', [2], 'alphaicon', 0, undefined);
 	}
 
 	function getSettings() {
