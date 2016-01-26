@@ -1,6 +1,6 @@
 var animationDuration = 500;
 
-var SmartRBoxplot = (function () {
+var SmartRCorrelation = (function () {
 
     var service = {};
 
