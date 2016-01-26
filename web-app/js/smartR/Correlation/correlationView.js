@@ -10,6 +10,8 @@ window.smartR.CorrelationView = function (controller, model) {
     view.model = model;
     view.workflow = 'correlation';
 
+    view.container = $('#heim-tabs');
+
     view.datapoints = {
         inputEl : $('#datapoints'),
         clearBtn : $('#sr-datapoints-btn')
@@ -24,6 +26,8 @@ window.smartR.CorrelationView = function (controller, model) {
     view.runBoxplotBtn = $('#sr-btn-run-correlation');
 
     view.init = function () {
+        // init tabs
+        view.container.tabs();
         bindUIActions();
     };
 
