@@ -1,23 +1,26 @@
-%{--<r:require modules="smartR_correlation"/>--}%
-<r:layoutResources disposition="defer"/>
+<r:require modules="smartR_correlation"/>
+<r:layoutResources/>
 
-<mark>Step 1:</mark> Drop two numerical variables into this window.<br/>
-(Example: Age & Survival Time)<br/>
 <div id='datapoints' class="queryGroupIncludeSmall"></div>
-<input type="button" class='txt' onclick="clearVarSelection('datapoints')" value="Clear Window"><br/>
+<input type="button" class='txt'  value="Clear Window" id="sr-datapoints-btn">
 <br/>
-<mark>Step 2 (optional):</mark> Drop annotations into this window.<br/>
-(Example: TumorStages/NA, Tumor Stages/T1, Tumor Stages/T2)<br/>
+
 <div id='annotations' class="queryGroupIncludeSmall"></div>
-<input type="button" class='txt' onclick="clearVarSelection('annotations')" value="Clear Window"><br/>
+<input type="button" class='txt'  value="Clear Window" id="sr-annotations-btn">
 <br/>
-<mark>Step 3:</mark> Choose a method for the correlation analysis.<br/>
+
 <select id="methodSelect" class='txt'>
 	<option value="pearson">Pearson (Default)</option>
 	<option value="kendall">Kendall</option>
 	<option value="spearman">Spearman</option>
 </select><br/>
 <br/>
+
+<button id="sr-btn-fetch-correlation" class="sr-action-button">Fetch Data</button>
+<button id="sr-btn-run-correlation" class="sr-action-button">Run Boxplot</button>
+
+%{--result--}%
+<div id="heim-run-output" class="sr-output-container"></div>
 
 <script>
 	activateDragAndDrop('datapoints');
@@ -36,3 +39,9 @@
 		return true;
 	}
 </script>
+
+<g:javascript>
+	smartR.initAnalysis('correlation');
+</g:javascript>
+
+<r:layoutResources/>

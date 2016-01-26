@@ -37,4 +37,13 @@ modules = {
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotController.js']
         resource url: [plugin: 'smart-r', dir: 'js/smartR/Boxplot', file: 'boxplotView.js']
     }
+
+    smartR_correlation {
+        dependsOn 'smartR_analysis_common'
+        resource url: [plugin: 'smart-r', dir: 'css', file: 'Correlation.css']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'd3Correlation.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlationModel.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlationController.js']
+        resource url: [plugin: 'smart-r', dir: 'js/smartR/Correlation', file: 'correlationView.js']
+    }
 }
