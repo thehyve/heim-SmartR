@@ -1,13 +1,7 @@
-if (! suppressMessages(require(reshape2))) stop("SmartR requires the R package 'reshape2'")
+library(reshape2)
 
 main <- function() {
     points <- loaded_variables[[1]] # TODO
-
-    conceptStrToFolderStr <- function(s) {
-        splitString <- strsplit(s, "")[[1]]
-        backslashs <- which(splitString == "\\")
-        substr(s, 0, tail(backslashs, 2)[1])
-    }
 
     points <- SmartR.data.cohort1$datapoints
     concepts <- unique(points$concept)
@@ -55,4 +49,10 @@ main <- function() {
     output$points <- df
 
     list(jsn = toJSON(output, pretty=TRUE))
+}
+
+conceptStrToFolderStr <- function(s) {
+    splitString <- strsplit(s, "")[[1]]
+    backslashs <- which(splitString == "\\")
+    substr(s, 0, tail(backslashs, 2)[1])
 }
