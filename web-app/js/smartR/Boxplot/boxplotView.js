@@ -25,11 +25,11 @@ window.smartR.boxplotView = function(controller,
     view.runOutputContainer = $('#heim-run-output');
 
     view.init = function() {
-        // init controller
-        controller.init();
+
+        controller.init(); // will create new r session
 
         //init tab
-        view.container.tabs();
+        view.container.tabs();  //jquery UI call to init tabs
 
         // bind ui
         bindUIActions();

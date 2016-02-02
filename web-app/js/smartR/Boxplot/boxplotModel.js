@@ -16,6 +16,8 @@ window.smartR.boxplotModel = function(components) {
     });
     components.fetchDataStep.forwardEvent('loadedVariables', model);
 
+    // model.fetchDataStep = components.fetchedDataStep;// alternative to the line above
+
     // expose runStep component
     model.getRunOutput = function BoxPlotModel_getRunOutput() {
         // yep, it's JSON encoded as a string inside JSON...
