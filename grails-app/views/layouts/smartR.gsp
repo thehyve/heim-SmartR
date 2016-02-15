@@ -1,16 +1,8 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: sascha
-  Date: 11/02/16
-  Time: 15:16
---%>
 
-<%@ page contentType="text/html;charset=UTF-8" %>
-<html>
-<head>
-  <title></title>
-</head>
-<body>
+<r:require module="smartR_core"/>
+<r:require module="smartR_angular_components"/>
 
-</body>
-</html>
+<g:layoutHead/>
+<r:layoutResources/>
+
+<g:layoutBody/>

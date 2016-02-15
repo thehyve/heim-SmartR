@@ -37,7 +37,10 @@ class SmartRController {
     def loadScripts = {
 
         // list of required javascript files
-        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
+        def scripts = [
+            servletContext.contextPath + pluginContextPath + '/js/resource/angular.min.js',
+            servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js'
+        ]
 
         // list of required css files
         def styles = []

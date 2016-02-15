@@ -1,5 +1,5 @@
 
-smartRApp.directive('conceptBox', [function() {
+window.smartRApp.directive('conceptBox', [function() {
 
     function clearWindow(dom) {
         $(dom).children().remove()
@@ -25,7 +25,8 @@ smartRApp.directive('conceptBox', [function() {
         template: '<div class="queryGroupIncludeSmall"></div>' +
                 '<input type="button" value="Clear Window">',
         link: function(scope, element) {
-            var template_box = element.children()[0];
+            var template_box = element.children()[
+                0];
             var template_btn = element.children()[1];
 
             // activate drag & drop for our conceptBox once it is rendered
