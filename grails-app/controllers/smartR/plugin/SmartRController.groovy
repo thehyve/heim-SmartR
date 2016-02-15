@@ -14,10 +14,7 @@ class SmartRController {
     static layout = 'smartR'
 
     def index() {
-        [
-                scriptList: sessionService.availableWorkflows(),
-                //legacyScriptList: sessionService.legacyWorkflows(), FIXME display rest original scripts
-        ]
+        [scriptList: sessionService.availableWorkflows() as JSON]
     }
 
     /**
