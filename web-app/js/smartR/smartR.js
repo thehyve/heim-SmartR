@@ -369,7 +369,8 @@ function mouseY() {
 }
 
 function getMaxWidth(selection) {
-    return selection[0].map(function(d) { return d.getBBox().width; }).max()
+    var widths = selection[0].map(function(d) { return d.getBBox().width; })
+    return Math.max.apply(Math, widths)
 }
 
 function showCohortInfo() {
@@ -393,10 +394,6 @@ function showCohortInfo() {
 function updateInputView() {
     if (typeof updateOnView === 'function') updateOnView()
 }
-
-var panelItem = jQuery('#resultsTabPanel__smartRPanel')
-//panelItem.click(showCohortInfo)
-//panelItem.click(updateInputView)
 
 function shortenConcept(concept) {
     var splits = concept.split('\\')

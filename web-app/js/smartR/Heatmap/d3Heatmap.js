@@ -210,7 +210,7 @@ window.SmartRHeatmap = (function(){
                 })
                 .on('click', function(d) {
                     var genes = d.UID.split("--");
-                    genes.each(function(gene) {
+                    genes.forEach(function(gene) {
                         var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene;
                         window.open(url);
                     });
@@ -664,7 +664,7 @@ window.SmartRHeatmap = (function(){
                 .map(function(d) { return [d.idx, histogramScale(d.significance)]; }) // This line is a bit hacky
                 .sort(function(a, b) { return a[1] - b[1]; })
                 .filter(function(d, i) { return i < cutoff; })
-                .each(function(d) {
+                .forEach(function(d) {
                     d3.select('.bar.idx-' + d[0]).classed('cuttoffHighlight', true);
                     d3.selectAll('.square.uid-' + uids[d[0]]).classed('cuttoffHighlight', true);
                 });
@@ -849,11 +849,11 @@ window.SmartRHeatmap = (function(){
                 }).on('click', function (d) {
                     var leafs = d.index.split(' ');
                     var genes = [];
-                    leafs.each(function(leaf) {
+                    leafs.forEach(function(leaf) {
                         var uid = uids[leaf];
                         var split = uid.split("--");
                         split.shift();
-                        split.each(function(gene) { genes.push(gene); });
+                        split.forEach(function(gene) { genes.push(gene); });
                     });
                     $.ajax({
                         url: 'http://biocompendium.embl.de/cgi-bin/biocompendium.cgi',
@@ -910,7 +910,7 @@ window.SmartRHeatmap = (function(){
         function updateRowOrder(sortValues) {
             var sortedUIDs = [];
             var sortedSignificanceValues = [];
-            sortValues.each(function(sortValue) {
+            sortValues.forEach(function(sortValue) {
                 sortedUIDs.push(uids[sortValue]);
                 sortedSignificanceValues.push(significanceValues[sortValue]);
             });
