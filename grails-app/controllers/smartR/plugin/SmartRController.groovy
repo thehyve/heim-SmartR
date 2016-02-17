@@ -27,13 +27,13 @@ class SmartRController {
         if (! params.script) {
             render 'Please select a script to execute.'
         } else {
-            render template: "/heim/${FilenameUtils.getBaseName(params.script).capitalize()}"
+            render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
         }
     }
 
     /**
-    *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
-    */
+     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
+     */
     def loadScripts = {
 
         // list of required javascript files

@@ -7,7 +7,7 @@ class SmartRExportedUrlMappings {
             }
         }
 
-        "/"(view:"/index")
+        "/"(view:"/smartR/index")
         "500"(view:'/error')
     }
 }
