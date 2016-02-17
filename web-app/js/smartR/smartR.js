@@ -421,30 +421,30 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
         autoLoad: {
             url: pageInfo.basePath + '/smartR/index',
             method: 'POST',
-            scripts: true
+            evalScripts: false
         },
         listeners: {
             render: function (panel) {
                 panel.body.on('click', function () {
                     if (typeof updateOnView === "function") {
-                        updateOnView();
+                        updateOnView()
                     }
                 })
             }
         }
-    });
-    parentPanel.add(smartRPanel);
-};
+    })
+    parentPanel.add(smartRPanel)
+}
 
 
 
-function changeInputDIV(workflow) {
+function changeInputDIV() {
     jQuery('#outputDIV').empty();
     var request = jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInput',
         type: 'POST',
         timeout: 10000,
-        data: {script: workflow}
+        data: {script: jQuery('#scriptSelect').val()}
     });
     request.done(function(response) { jQuery('#inputDIV').html(response) });
     request.fail(function() { alert('Server does not respond. Network connection lost?') });

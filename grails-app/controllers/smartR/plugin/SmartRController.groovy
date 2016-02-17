@@ -14,7 +14,10 @@ class SmartRController {
     static layout = 'smartR'
 
     def index() {
-        [scriptList: sessionService.availableWorkflows() as JSON]
+        [
+                scriptList: sessionService.availableWorkflows(),
+                //legacyScriptList: sessionService.legacyWorkflows(), FIXME display rest original scripts
+        ]
     }
 
     /**
@@ -24,19 +27,17 @@ class SmartRController {
         if (! params.script) {
             render 'Please select a script to execute.'
         } else {
-            render template: "/heim/${FilenameUtils.getBaseName(params.script).capitalize()}"
+            render template: "/heim/in${FilenameUtils.getBaseName(params.script).capitalize()}"
         }
     }
 
     /**
-    *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
-    */
+     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
+     */
     def loadScripts = {
 
         // list of required javascript files
-        def scripts = [
-            servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js'
-        ]
+        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
 
         // list of required css files
         def styles = []
