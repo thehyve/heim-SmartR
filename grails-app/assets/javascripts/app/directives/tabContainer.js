@@ -1,4 +1,5 @@
 
+console.log('Loading tabContainer...');
 window.smartRApp.directive('tabContainer', ['smartRUtils', '$timeout', function(smartRUtils, $timeout) {
     return {
         restrict: 'E',

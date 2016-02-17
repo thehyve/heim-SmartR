@@ -1,5 +1,6 @@
 
-smartRApp.directive('boxPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+console.log('Loading boxPlot...');
+window.smartRApp.directive('boxPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',

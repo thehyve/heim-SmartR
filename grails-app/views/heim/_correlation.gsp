@@ -1,5 +1,4 @@
-<r:require module="smartR_correlation"/>
-<r:layoutResources disposition="head"/>
+<r:layoutResources />
 
 <div ng-controller="CorrelationController">
 
@@ -35,4 +34,4 @@
 
 </div>
 
-<r:layoutResources disposition="defer"/>
+<r:layoutResources />

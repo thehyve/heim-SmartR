@@ -1,4 +1,5 @@
 
+console.log('Loading ngTranscludeReplace...');
 window.smartRApp.directive('ngTranscludeReplace', ['$log', function ($log) {
     return {
         terminal: true,

@@ -449,5 +449,3 @@ function changeInputDIV(workflow) {
     request.done(function(response) { jQuery('#inputDIV').html(response) });
     request.fail(function() { alert('Server does not respond. Network connection lost?') });
 }
-
-window.smartRApp = angular.module('smartRApp', []);

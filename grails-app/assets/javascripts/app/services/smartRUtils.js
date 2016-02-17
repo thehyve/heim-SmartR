@@ -1,4 +1,5 @@
 
+console.log('Loading smartRUtils...');
 window.smartRApp.factory('smartRUtils', ['$q', function($q) {
 
     var service = {};

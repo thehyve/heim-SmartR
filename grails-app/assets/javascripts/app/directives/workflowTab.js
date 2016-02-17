@@ -1,4 +1,5 @@
 
+console.log('Loading workflowTab...');
 window.smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
     return {
         restrict: 'E',

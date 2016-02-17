@@ -1,4 +1,5 @@
 
+console.log('Loading runButton...');
 window.smartRApp.directive('runButton', ['rServeService', function(rServeService) {
     return {
         restrict: 'E',

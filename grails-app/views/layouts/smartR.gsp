@@ -1,8 +1,5 @@
 
-<r:require module="smartR_core"/>
-<r:require module="smartR_angular_components"/>
+<r:layoutResources />
+<r:layoutResources />
 
-<g:layoutHead/>
-<r:layoutResources/>
-
-<g:layoutBody/>
+<g:layoutBody />

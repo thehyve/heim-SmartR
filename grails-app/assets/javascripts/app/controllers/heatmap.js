@@ -1,5 +1,6 @@
 
-smartRApp.controller('HeatmapController',
+console.log('Loading HeatmapController...');
+window.smartRApp.controller('HeatmapController',
     ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 
         // initialize service

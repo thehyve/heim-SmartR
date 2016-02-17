@@ -1,4 +1,5 @@
 
+console.log('Loading correlationPlot...');
 window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {

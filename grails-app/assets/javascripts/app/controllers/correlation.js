@@ -1,4 +1,5 @@
 
+console.log('Loading CorrelationController...');
 window.smartRApp.controller('CorrelationController',
     ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 

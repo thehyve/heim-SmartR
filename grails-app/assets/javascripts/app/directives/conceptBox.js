@@ -1,4 +1,5 @@
 
+console.log('Loading conceptBox...');
 window.smartRApp.directive('conceptBox', [function() {
 
     function clearWindow(dom) {

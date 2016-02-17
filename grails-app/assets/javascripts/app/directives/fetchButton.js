@@ -1,4 +1,5 @@
 
+console.log('Loading fetchButton...');
 window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', function(rServeService, smartRUtils) {
     return {
         restrict: 'E',

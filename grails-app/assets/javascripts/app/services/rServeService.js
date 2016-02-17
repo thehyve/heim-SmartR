@@ -1,4 +1,5 @@
 
+console.log('Loading rServeService...');
 window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', function(smartRUtils, $q, $http) {
 
     var service = {};
