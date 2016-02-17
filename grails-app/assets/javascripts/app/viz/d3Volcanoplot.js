@@ -1,4 +1,6 @@
-smartRApp.directive('volcanoPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+
+console.log('Loading volcanoPlot...');
+window.smartRApp.directive('volcanoPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',

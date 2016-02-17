@@ -1,13 +1,32 @@
-<r:require modules="smartR_core"/>
-<r:layoutResources/>
+<!doctype html>
 
-<div data-ng-app="smartRApp" style="padding: 10px;">
-    <h1>SmartR - Dynamic Data Visualization and Interaction</h1>
-    <br>
-    <g:select name="scriptSelect" id="scriptSelect" from="${scriptList}"
-              noSelection="['': 'Choose an algorithm']"
-              onchange="changeInputDIV()" />
+<html ng-app="smartRApp">
+    <head>
+        <asset:stylesheet href="smartR.css"/>
+        <asset:javascript src="app.js"/>
+    </head>
 
-    <div id="inputDIV"></div>
-</div>
-<r:layoutResources/>
+    <body>
+        <h1 style="font-size: 20px; padding: 5px">SmartR - Dynamic Data Visualization and Interaction</h1>
+        <div align="center">
+            <div class="sr-landing-dropdown" align="center">
+                <button class="sr-landing-dropBtn">SmartR Workflows</button>
+                <div class="sr-landing-dropdown-content"></div>
+            </div>
+        </div>
+        <hr/>
+        <hr/>
+        <div id="inputDIV"></div>
+
+        <script>
+            jQuery(document).ready(function() {
+                ${scriptList}.each(function (workflow) {
+                    jQuery('.sr-landing-dropdown-content').append('<span onclick="changeInputDIV(\'' + workflow + '\')">' + workflow.capitalize() + '</span>')
+                });
+            });
+        </script>
+    </body>
+</html>
+
+
+

@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/directives/tabContainer.js
+=======
+console.log('Loading tabContainer...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/directives/tabContainer.js
 window.smartRApp.directive('tabContainer', ['smartRUtils', '$timeout', function(smartRUtils, $timeout) {
     return {
         restrict: 'E',

@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/directives/fetchButton.js
+=======
+console.log('Loading fetchButton...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/directives/fetchButton.js
 window.smartRApp.directive('fetchButton', ['rServeService', 'smartRUtils', function(rServeService, smartRUtils) {
     return {
         restrict: 'E',

@@ -1,5 +1,6 @@
 
-smartRApp.directive('timelinePlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+console.log('Loading timelinePlot...');
+window.smartRApp.directive('timelinePlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',

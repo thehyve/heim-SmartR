@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/directives/runButton.js
+=======
+console.log('Loading runButton...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/directives/runButton.js
 window.smartRApp.directive('runButton', ['rServeService', function(rServeService) {
     return {
         restrict: 'E',

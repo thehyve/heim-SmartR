@@ -1,5 +1,6 @@
 
-smartRApp.directive('heatmap', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
+console.log('Loading heatmap...');
+window.smartRApp.directive('heatmap', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {
         restrict: 'E',

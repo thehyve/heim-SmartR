@@ -1,5 +1,6 @@
 
-smartRApp.controller('BoxplotController',
+console.log('Loading BoxplotController...');
+window.smartRApp.controller('BoxplotController',
     ['$scope', 'smartRUtils', 'rServeService', function($scope, smartRUtils, rServeService) {
 
         // initialize service

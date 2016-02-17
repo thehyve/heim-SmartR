@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/viz/d3Correlation.js
+=======
+console.log('Loading correlationPlot...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/viz/d3Correlation.js
 window.smartRApp.directive('correlationPlot', ['smartRUtils', 'rServeService', function(smartRUtils, rServeService) {
 
     return {

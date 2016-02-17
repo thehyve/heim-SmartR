@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/directives/ngTranscludeReplace.js
+=======
+console.log('Loading ngTranscludeReplace...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/directives/ngTranscludeReplace.js
 window.smartRApp.directive('ngTranscludeReplace', ['$log', function ($log) {
     return {
         terminal: true,

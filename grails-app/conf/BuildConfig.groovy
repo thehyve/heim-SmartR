@@ -66,8 +66,7 @@ grails.project.dependency.resolution = {
         }
     }
     plugins {
-        runtime ':resources:1.2.14'
-        runtime "org.grails.plugins:angularjs-resources:1.4.2"
+        compile "org.grails.plugins:asset-pipeline:2.6.10"
 
         compile ":sendfile:0.2"
         build ':tomcat:7.0.47', {

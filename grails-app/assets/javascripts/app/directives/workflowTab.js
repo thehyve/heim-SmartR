@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/directives/workflowTab.js
+=======
+console.log('Loading workflowTab...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/directives/workflowTab.js
 window.smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
     return {
         restrict: 'E',

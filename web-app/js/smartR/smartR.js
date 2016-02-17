@@ -438,13 +438,13 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
 
 
 
-function changeInputDIV() {
+function changeInputDIV(workflow) {
     jQuery('#outputDIV').empty();
     var request = jQuery.ajax({
         url: pageInfo.basePath + '/SmartR/renderInput',
         type: 'POST',
         timeout: 10000,
-        data: {script: jQuery('#scriptSelect').val()}
+        data: {script: workflow}
     });
     request.done(function(response) { jQuery('#inputDIV').html(response) });
     request.fail(function() { alert('Server does not respond. Network connection lost?') });

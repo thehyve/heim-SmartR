@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/directives/conceptBox.js
+=======
+console.log('Loading conceptBox...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/directives/conceptBox.js
 window.smartRApp.directive('conceptBox', [function() {
 
     function clearWindow(dom) {
@@ -25,7 +29,8 @@ window.smartRApp.directive('conceptBox', [function() {
         template: '<div class="queryGroupIncludeSmall"></div>' +
                 '<input type="button" value="Clear Window">',
         link: function(scope, element) {
-            var template_box = element.children()[0];
+            var template_box = element.children()[
+                0];
             var template_btn = element.children()[1];
 
             // activate drag & drop for our conceptBox once it is rendered

@@ -1,4 +1,8 @@
 
+<<<<<<< HEAD:web-app/js/smartR/_angular/services/rServeService.js
+=======
+console.log('Loading rServeService...');
+>>>>>>> AngularJSPort:grails-app/assets/javascripts/app/services/rServeService.js
 window.smartRApp.factory('rServeService', ['smartRUtils', '$q', '$http', function(smartRUtils, $q, $http) {
 
     var service = {};

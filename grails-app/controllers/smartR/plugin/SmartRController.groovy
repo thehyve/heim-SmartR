@@ -14,10 +14,7 @@ class SmartRController {
     static layout = 'smartR'
 
     def index() {
-        [
-                scriptList: sessionService.availableWorkflows(),
-                //legacyScriptList: sessionService.legacyWorkflows(), FIXME display rest original scripts
-        ]
+        [scriptList: sessionService.availableWorkflows() as JSON]
     }
 
     /**
@@ -37,7 +34,9 @@ class SmartRController {
     def loadScripts = {
 
         // list of required javascript files
-        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
+        def scripts = [
+            servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js'
+        ]
 
         // list of required css files
         def styles = []
