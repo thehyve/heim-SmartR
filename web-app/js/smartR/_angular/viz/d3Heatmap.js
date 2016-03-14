@@ -953,17 +953,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('r', 4.5)
                 .attr('transform', function (d) {
                     return 'translate(' + d.x + ',' + (-spacing - w + d.y) + ')';
-                }).on('click', function (d) {
-                    var previousSelection = selectedPatientIDs.slice();
-                    unselectAll();
-                    var leafs = d.index.split(' ');
-                    for (var i = 0; i < leafs.length; i++) {
-                        var patientID = patientIDs[leafs[i]];
-                        selectCol(patientID);
-                    }
-                    if (arrEqual(previousSelection, selectedPatientIDs)) {
-                        unselectAll();
-                    }
                 })
                 .on('mouseover', function (d) {
                     tooltip
