@@ -1,5 +1,5 @@
 function createD3Button(args) {
-    var button = args.location.append('g')
+    var button = args.location.append('g');
 
     var box = button.append('rect')
         .attr('x', args.x)
@@ -15,20 +15,20 @@ function createD3Button(args) {
         .on('mouseover', function() {
             box.transition()
                 .duration(300)
-                .style('fill', '#ffffff')
+                .style('fill', '#ffffff');
             text.transition()
                 .duration(300)
-                .style('fill', '#009ac9')
+                .style('fill', '#009ac9');
         })
         .on('mouseout', function() {
             box.transition()
                 .duration(300)
-                .style('fill', '#009ac9')
+                .style('fill', '#009ac9');
             text.transition()
                 .duration(300)
-                .style('fill', '#ffffff')
+                .style('fill', '#ffffff');
         })
-        .on('click', function() { return args.callback() })
+        .on('click', function() { return args.callback() });
 
     var text = button.append('text')
         .attr('x', args.x + args.width / 2)
@@ -38,16 +38,16 @@ function createD3Button(args) {
         .style('text-anchor', 'middle')
         .style('fill', '#ffffff')
         .style('font-size', '14px')
-        .text(args.label)
+        .text(args.label);
 
-    return button
+    return button;
 }
 
 function createD3Switch(args) {
-    var switcher = args.location.append('g')
+    var switcher = args.location.append('g');
 
-    var checked = args.checked
-    var color = checked ? 'green' : 'red'
+    var checked = args.checked;
+    var color = checked ? 'green' : 'red';
 
     var box = switcher.append('rect')
         .attr('x', args.x)
@@ -65,20 +65,20 @@ function createD3Switch(args) {
                 box.transition()
                     .duration(300)
                     .style('stroke', 'red')
-                    .style('fill', 'red')
-                color = 'red'
-                checked = false
+                    .style('fill', 'red');
+                color = 'red';
+                checked = false;
             } else {
                 box.transition()
                     .duration(300)
                     .style('stroke', 'green')
-                    .style('fill', 'green')
-                color = 'green'
-                checked = true
+                    .style('fill', 'green');
+                color = 'green';
+                checked = true;
             }
-            text.text(checked ? args.onlabel : args.offlabel)
-            args.callback(checked)
-        })
+            text.text(checked ? args.onlabel : args.offlabel);
+            args.callback(checked);
+        });
 
     var text = switcher.append('text')
         .attr('x', args.x + args.width / 2)
@@ -88,30 +88,30 @@ function createD3Switch(args) {
         .style('text-anchor', 'middle')
         .style('fill', '#ffffff')
         .style('font-size', '14px')
-        .text(checked ? args.onlabel : args.offlabel)
+        .text(checked ? args.onlabel : args.offlabel);
 
-    return switcher
+    return switcher;
 }
 
 function createD3Dropdown(args) {
     function shrink() {
         dropdown.selectAll('.itemBox')
             .attr('y', args.y + args.height)
-            .style('visibility', 'hidden')
+            .style('visibility', 'hidden');
         dropdown.selectAll('.itemText')
             .attr('y', args.y + args.height + args.height / 2)
-            .style('visibility', 'hidden')
-        itemHovered = false
-        hovered = false
-        itemHovered = false
+            .style('visibility', 'hidden');
+        itemHovered = false;
+        hovered = false;
+        itemHovered = false;
     }
-    var dropdown = args.location.append('g')
+    var dropdown = args.location.append('g');
 
-    var hovered = false
-    var itemHovered = false
+    var hovered = false;
+    var itemHovered = false;
 
     var itemBox = dropdown.selectAll('.itemBox')
-        .data(args.items, function(item) { return item.label })
+        .data(args.items, function(item) { return item.label });
 
     itemBox.enter()
         .append('rect')
@@ -128,24 +128,24 @@ function createD3Dropdown(args) {
         .style('fill', '#E3E3E3')
         .style('visibility', 'hidden')
         .on('mouseover', function() {
-            itemHovered = true
+            itemHovered = true;
             d3.select(this)
-                .style('fill', '#009ac9')
+                .style('fill', '#009ac9');
         })
         .on('mouseout', function() {
-            itemHovered = false
+            itemHovered = false;
             d3.select(this)
-                .style('fill', '#E3E3E3')
+                .style('fill', '#E3E3E3');
             setTimeout(function() {
                 if (! hovered && ! itemHovered) {
-                    shrink()
+                    shrink();
                 }
-            }, 50)
+            }, 50);
         })
-        .on('click', function(d) { d.callback() })
+        .on('click', function(d) { d.callback() });
 
     var itemText = dropdown.selectAll('.itemText')
-        .data(args.items, function(item) { return item.label })
+        .data(args.items, function(item) { return item.label; });
 
     itemText
         .enter()
@@ -159,7 +159,7 @@ function createD3Dropdown(args) {
         .style('fill', '#000000')
         .style('font-size', '14px')
         .style('visibility', 'hidden')
-        .text(function(d) { return d.label })
+        .text(function(d) { return d.label; });
 
     var box = dropdown.append('rect')
         .attr('x', args.x)
@@ -173,41 +173,43 @@ function createD3Dropdown(args) {
         .style('fill', '#009ac9')
         .on('mouseover', function() {
             if (hovered) {
-                return
+                return;
             }
             dropdown.selectAll('.itemBox')
                 .transition()
                 .duration(300)
                 .style('visibility', 'visible')
                 .attr('y', function(d) {
-                    var idx = args.items.findIndex(function(item) { return item.label === d.label })
-                    return 2 + args.y + (idx + 1) * args.height
-                })
+                    var labels = args.items.map(function(item) { return item.label; });
+                    var idx = labels.indexOf(d.label);
+                    return 2 + args.y + (idx + 1) * args.height;
+                });
 
             dropdown.selectAll('.itemText')
                 .transition()
                 .duration(300)
                 .style('visibility', 'visible')
                 .attr('y', function(d) {
-                    var idx = args.items.findIndex(function(item) { return item.label === d.label })
+                    var labels = args.items.map(function(item) { return item.label; });
+                    var idx = labels.indexOf(d.label);
                     return 2 + args.y + (idx + 1) * args.height + args.height / 2
-                })
+                });
 
-            hovered = true
+            hovered = true;
         })
         .on('mouseout', function() {
-            hovered = false
+            hovered = false;
             setTimeout(function() {
                 if (! hovered && ! itemHovered) {
-                    shrink()
+                    shrink();
                 }
-            }, 50)
+            }, 50);
             setTimeout(function() { // first check is not enough if animation interrupts it
                 if (! hovered && ! itemHovered) {
-                    shrink()
+                    shrink();
                 }
-            }, 350)
-        })
+            }, 350);
+        });
 
     var text = dropdown.append('text')
         .attr('class', 'buttonText')
@@ -218,29 +220,29 @@ function createD3Dropdown(args) {
         .style('text-anchor', 'middle')
         .style('fill', '#ffffff')
         .style('font-size', '14px')
-        .text(args.label)
+        .text(args.label);
 
-    return dropdown
+    return dropdown;
 }
 
 function createD3Slider(args) {
-    var slider = args.location.append('g')
+    var slider = args.location.append('g');
 
     var lineGen = d3.svg.line()
-        .x(function(d) { return d.x })
-        .y(function(d) { return d.y })
-        .interpolate('linear')
+        .x(function(d) { return d.x; })
+        .y(function(d) { return d.y; })
+        .interpolate('linear');
 
     var lineData = [
         {x: args.x, y: args.y + args.height},
         {x: args.x, y: args.y + 0.75 * args.height},
         {x: args.x + args.width, y: args.y + 0.75 * args.height},
         {x: args.x + args.width, y: args.y + args.height}
-    ]
+    ];
 
     var sliderScale = d3.scale.linear()
         .domain([args.min, args.max])
-        .range([args.x, args.x + args.width])
+        .range([args.x, args.x + args.width]);
 
     slider.append('path')
         .attr('d', lineGen(lineData))
@@ -248,7 +250,7 @@ function createD3Slider(args) {
         .style('stroke', '#009ac9')
         .style('stroke-width', '2px')
         .style('shape-rendering', 'crispEdges')
-        .style('fill', 'none')
+        .style('fill', 'none');
 
     slider.append('text')
         .attr('x', args.x)
@@ -258,7 +260,7 @@ function createD3Slider(args) {
         .style('text-anchor', 'middle')
         .style('fill', '#000000')
         .style('font-size', '9px')
-        .text(args.min)
+        .text(args.min);
 
     slider.append('text')
         .attr('x', args.x + args.width)
@@ -268,7 +270,7 @@ function createD3Slider(args) {
         .style('text-anchor', 'middle')
         .style('fill', '#000000')
         .style('font-size', '9px')
-        .text(args.max)
+        .text(args.max);;
 
     slider.append('text')
         .attr('x', args.x + args.width / 2)
@@ -278,35 +280,35 @@ function createD3Slider(args) {
         .style('text-anchor', 'middle')
         .style('fill', '#000000')
         .style('font-size', '14px')
-        .text(args.label)
+        .text(args.label);
 
-    var currentValue = args.init
+    var currentValue = args.init;
 
     function move() {
-        var xPos = d3.event.x
+        var xPos = d3.event.x;
         if (xPos < args.x) {
-            xPos = args.x
+            xPos = args.x;
         } else if (xPos > args.x + args.width) {
-            xPos = args.x + args.width
+            xPos = args.x + args.width;
         }
 
-        currentValue = Number(sliderScale.invert(xPos)).toFixed(5)
+        currentValue = Number(sliderScale.invert(xPos)).toFixed(5);
 
         dragger
-            .attr('x', xPos - 20)
+            .attr('x', xPos - 20);
         handle
-            .attr('cx', xPos)
+            .attr('cx', xPos);
         pointer
             .attr('x1', xPos)
-            .attr('x2', xPos)
+            .attr('x2', xPos);
         value
             .attr('x', xPos + 10)
-            .text(currentValue)
+            .text(currentValue);
     }
 
     var drag = d3.behavior.drag()
         .on('drag', move)
-        .on(args.trigger, function() { args.callback(currentValue) })
+        .on(args.trigger, function() { args.callback(currentValue); });
 
     var dragger = slider.append('rect')
         .attr('x', sliderScale(args.init) - 20)
@@ -317,24 +319,24 @@ function createD3Slider(args) {
         .style('cursor', 'pointer')
         .on('mouseover', function() {
             handle
-                .style('fill', '#009ac9')
+                .style('fill', '#009ac9');
             pointer
-                .style('stroke', '#009ac9')
+                .style('stroke', '#009ac9');
         })
         .on('mouseout', function() {
             handle
-                .style('fill', '#000000')
+                .style('fill', '#000000');
             pointer
-                .style('stroke', '#000000')
+                .style('stroke', '#000000');
         })
-        .call(drag)
+        .call(drag);
 
     var handle = slider.append('circle')
         .attr('cx', sliderScale(args.init))
         .attr('cy', args.y + 10)
         .attr('r', 6)
         .style('pointer-events', 'none')
-        .style('fill', '#000000')
+        .style('fill', '#000000');
 
     var pointer = slider.append('line')
         .attr('x1', sliderScale(args.init))
@@ -343,7 +345,7 @@ function createD3Slider(args) {
         .attr('y2', args.y + 0.75 * args.height)
         .style('pointer-events', 'none')
         .style('stroke', '#000000')
-        .style('stroke-width', '1px')
+        .style('stroke-width', '1px');
 
     var value = slider.append('text')
         .attr('x', sliderScale(args.init) + 10)
@@ -353,57 +355,14 @@ function createD3Slider(args) {
         .style('text-anchor', 'start')
         .style('fill', '#000000')
         .style('font-size', '10px')
-        .text(args.init)
+        .text(args.init);
 
-    return slider
-}
-
-function mouseX() {
-    var mouseXPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageX : d3.event.clientX
-    return mouseXPos + $('#index').parent().scrollLeft() - $('#smartRPanel').offset().left
-}
-
-function mouseY() {
-    var mouseYPos = typeof d3.event.sourceEvent !== 'undefined' ? d3.event.sourceEvent.pageY : d3.event.clientY
-    return mouseYPos + $('#index').parent().scrollTop() - $('#smartRPanel').offset().top
+    return slider;
 }
 
 function getMaxWidth(selection) {
-    var widths = selection[0].map(function(d) { return d.getBBox().width; })
-    return Math.max.apply(Math, widths)
-}
-
-function showCohortInfo() {
-    var cohortsSummary = ''
-
-    for(var i = 1; i < GLOBAL.NumOfSubsets; i++) {
-        var currentQuery = getQuerySummary(i)
-        if(currentQuery !== '') {
-            cohortsSummary += '<br/>Subset ' + (i) + ': <br/>'
-            cohortsSummary += currentQuery
-            cohortsSummary += '<br/>'
-        }
-    }
-    if (!cohortsSummary) {
-        cohortsSummary = '<br/>WARNING: No subsets have been selected! Please go to the "Comparison" tab and select your subsets.'
-    }
-    $('#cohortInfo').html(cohortsSummary)
-}
-//showCohortInfo()
-
-function updateInputView() {
-    if (typeof updateOnView === 'function') updateOnView()
-}
-
-function shortenConcept(concept) {
-    var splits = concept.split('\\')
-    return splits[splits.length - 3] + '/' + splits[splits.length - 2]
-}
-
-function activateDragAndDrop(divName) {
-    var div = Ext.get(divName)
-    var dtgI = new Ext.dd.DropTarget(div, {ddGroup: 'makeQuery'})
-    dtgI.notifyDrop = dropOntoCategorySelection
+    var widths = selection[0].map(function(d) { return d.getBBox().width; });
+    return Math.max.apply(Math, widths);
 }
 
 window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
@@ -421,41 +380,33 @@ window.addSmartRPanel = function addSmartRPanel(parentPanel, config) {
             title: 'R Scripts',
             items: []
         }),
-        autoLoad: {
-            url: pageInfo.basePath + '/smartR/index',
-            method: 'POST',
-            evalScripts: false
-        },
         listeners: {
             render: function (panel) {
                 panel.body.on('click', function () {
                     if (typeof updateOnView === "function") {
-                        updateOnView()
+                        updateOnView();
                     }
-                })
+                });
+
+                /**
+                 * WORKAROUND : code below is needed to reorder the javascript script load that're broken due to
+                 * ExtJS panel
+                 */
+                // start workaround
+                var updater = panel.getUpdater();
+                updater.on('update', function() {
+                    var panelBody = jQuery(arguments[0].dom);
+                    var scripts = panelBody.children('script');
+                    scripts.remove(); // remove scripts from panel body
+                    panelBody.append(scripts); // re-append again
+                });
+                updater.update({
+                    url: pageInfo.basePath + '/smartR/index',
+                    method: 'POST',
+                    scripts: false });
+                // end workaround
             }
         }
-    })
-    parentPanel.add(smartRPanel)
-}
-
-function clearVarSelection(divName) {
-    $('#' + divName).children().remove()
-}
-
-function getConcepts(divName) {
-    return $('#' + divName).children().toArray().map(function(childNode) {
-        return childNode.getAttribute('conceptid') })
-}
-
-function changeInputDIV() {
-    jQuery('#outputDIV').empty();
-    var request = jQuery.ajax({
-        url: pageInfo.basePath + '/SmartR/renderInput',
-        type: 'POST',
-        timeout: 10000,
-        data: {script: jQuery('#scriptSelect').val()}
     });
-    request.done(function(response) { jQuery('#inputDIV').html(response) });
-    request.fail(function() { alert('Server does not respond. Network connection lost?') });
-}
+    parentPanel.add(smartRPanel);
+};
