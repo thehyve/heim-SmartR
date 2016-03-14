@@ -166,7 +166,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 })
                 .on('click', function (d) {
                     var genes = d.UID.split("--");
-                    genes.each(function (gene) {
+                    genes.forEach(function (gene) {
                         var url = 'http://www.genecards.org/cgi-bin/carddisp.pl?gene=' + gene;
                         window.open(url);
                     });
@@ -953,17 +953,6 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 .attr('r', 4.5)
                 .attr('transform', function (d) {
                     return 'translate(' + d.x + ',' + (-spacing - w + d.y) + ')';
-                }).on('click', function (d) {
-                    var previousSelection = selectedPatientIDs.slice();
-                    unselectAll();
-                    var leafs = d.index.split(' ');
-                    for (var i = 0; i < leafs.length; i++) {
-                        var patientID = patientIDs[leafs[i]];
-                        selectCol(patientID);
-                    }
-                    if (arrEqual(previousSelection, selectedPatientIDs)) {
-                        unselectAll();
-                    }
                 })
                 .on('mouseover', function (d) {
                     tooltip
@@ -1016,12 +1005,14 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
                 }).on('click', function (d) {
                     var leafs = d.index.split(' ');
                     var genes = [];
-                    leafs.each(function (leaf) {
+                    leafs.forEach(function (leaf) {
                         var uid = uids[leaf];
                         var split = uid.split("--");
-                        split.shift();
-                        split.each(function (gene) {
-                            genes.push(gene);
+                        split.shift(); // discard probeID
+                        split.forEach(function(gene) {
+                            if (saneGene(gene)) {
+                                genes.push(gene);
+                            }
                         });
                     });
                     $.ajax({
@@ -1083,7 +1074,7 @@ window.smartRApp.directive('heatmapPlot', ['smartRUtils', 'rServeService', funct
         function updateRowOrder(sortValues) {
             var sortedUIDs = [];
             var sortedSignificanceValues = [];
-            sortValues.each(function (sortValue) {
+            sortValues.forEach(function (sortValue) {
                 sortedUIDs.push(uids[sortValue]);
                 sortedSignificanceValues.push(significanceValues[sortValue]);
             });
