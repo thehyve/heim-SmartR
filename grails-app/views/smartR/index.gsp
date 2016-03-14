@@ -6,8 +6,8 @@
 
     <div align="left">
         <div class="sr-landing-dropdown" align="center">
-            <button class="sr-landing-dropBtn">SmartR Workflows</button>
-            <div class="sr-landing-dropdown-content" style="position: relative">
+            <button class="sr-landing-dropBtn">SmartR Workflows<span class="sr-caret"></span></button>
+            <div class="sr-landing-dropdown-content">
                 <g:each in="${scriptList}">
                     <span ng-click="template='${it}'"> ${it.capitalize() + ' Workflow'} </span>
                 </g:each>
