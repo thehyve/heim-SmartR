@@ -44,28 +44,15 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
                 null: 'LD-categoric', // FIXME: alphaicon does not exist yet in transmartApp master branch
                 valueicon: 'LD-numeric'
             };
-            var _containsOnly = function() {
+            scope.containsOnly = function() {
                 return $(template_box).children().toArray().every(function(childNode) {
                     return typeMap[childNode.getAttribute('setnodetype')] === scope.type;
                 });
             };
 
-            var _setColor = function() {
-                if (scope.conceptGroup.length >= scope.min &&
-                    scope.conceptGroup.length <= scope.max &&
-                    _containsOnly()) {
-                    template_box.style.backgroundColor = 'green';
-                    template_box.style.opacity = 0.5;
-                } else {
-                    template_box.style.backgroundColor = 'red';
-                    template_box.style.opacity = 0.5;
-                }
-            };
-
             // activate drag & drop for our conceptBox and color it once it is rendered
             scope.$evalAsync(function() {
                 _activateDragAndDrop();
-                _setColor();
             });
 
             // bind the button to its clearing functionality
@@ -76,7 +63,6 @@ window.smartRApp.directive('conceptBox', ['$rootScope', function($rootScope) {
             // this watches the childNodes of the conceptBox and updates the model on change
             new MutationObserver(function() {
                 scope.conceptGroup = _getConcepts(); // update the model
-                _setColor(); // change to red or green color if input okay
                 scope.$apply();
             }).observe(template_box, { childList: true });
         }

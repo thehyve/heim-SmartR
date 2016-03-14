@@ -229,6 +229,10 @@ div.sr-status-and-output-container:empty:before {
     background-color: #3B5E94;
 }
 
+.sr-instruction {
+    color:red;
+}
+
 .mybutton {
     min-width: 150px;
     width: 100%;
