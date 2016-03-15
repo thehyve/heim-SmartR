@@ -18,7 +18,7 @@ window.smartRApp.factory('processService', [ function() {
             }
         };
 
-    var _toggleButton = function (label, value) {
+    service.toggleButton= function (label, value) {
         if (service.components.hasOwnProperty(label)) {
             service.components[label].disabled = value;
         }
@@ -38,6 +38,7 @@ window.smartRApp.factory('processService', [ function() {
         }
     };
 
+
     var _emptyResult = function (label, attr) {
         if (service.components.hasOwnProperty(label)) {
             service.components[label][attr] = {};
@@ -51,40 +52,42 @@ window.smartRApp.factory('processService', [ function() {
     };
 
     service.onFetching = function (value, status) {
-        _toggleButton(RUN_BTN, value);
+        service.toggleButton(PREPROCESS_BTN, value);
+        service.toggleButton(RUN_BTN, value);
+
         if (value) {
             _emptyResult(PREPROCESS_BTN, 'summaryData');
             _emptyResult(RUN_BTN, 'storage');
-            _toggleButton(CAPTURE_BTN, true);
-            _toggleButton(DOWNLOAD_BTN, true);
+            service.toggleButton(CAPTURE_BTN, true);
+            service.toggleButton(DOWNLOAD_BTN, true);
         }
         if (!value && status === service.status.SUCCESS) {
             var _sumData = service.components[FETCH_BTN].summaryData;
             // toggle preprocess button based on number of fetched samples
             // disable it when sample only one.
-            _toggleButton(PREPROCESS_BTN, _sumData.allSamples <= 1);
+            service.toggleButton(PREPROCESS_BTN, _sumData.allSamples <= 1);
             // toggle rank criteria based on number of fetched samples and number of subsets
             _toggleRankCriteria(SORTING_CRITERIA, _sumData.allSamples, _sumData.subsets);
         } else {
-            _toggleButton(PREPROCESS_BTN, value);
+            service.toggleButton(PREPROCESS_BTN, value);
         }
     };
 
     service.onPreprocessing = function (value) {
-        _toggleButton(FETCH_BTN, value);
-        _toggleButton(RUN_BTN, value);
+        service.toggleButton(FETCH_BTN, value);
+        service.toggleButton(RUN_BTN, value);
         if (value) {
             _emptyResult(RUN_BTN, 'storage');
-            _toggleButton(CAPTURE_BTN, true);
-            _toggleButton(DOWNLOAD_BTN, true);
+            service.toggleButton(CAPTURE_BTN, true);
+            service.toggleButton(DOWNLOAD_BTN, true);
         }
     };
 
     service.onRunning = function (value) {
-        _toggleButton(FETCH_BTN, value);
-        _toggleButton(PREPROCESS_BTN, value);
-        _toggleButton(CAPTURE_BTN, value);
-        _toggleButton(DOWNLOAD_BTN, value);
+        service.toggleButton(FETCH_BTN, value);
+        service.toggleButton(PREPROCESS_BTN, value);
+        service.toggleButton(CAPTURE_BTN, value);
+        service.toggleButton(DOWNLOAD_BTN, value);
     };
 
     return service;
