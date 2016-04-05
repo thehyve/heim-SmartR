@@ -104,6 +104,7 @@
             <download-results-button disabled="runAnalysis.download.disabled"></download-results-button>
             <br/>
             <heatmap-plot data="runAnalysis.scriptResults" width="1200" height="1200" params="runAnalysis.params"></heatmap-plot>
+            <marker-selection data="runAnalysis.scriptResults"></marker-selection>
 
         </workflow-tab>
 

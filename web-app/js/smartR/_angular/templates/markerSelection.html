@@ -1,0 +1,24 @@
+<table class="tablesorterAnalysisResults">
+    <thead>
+        <tr>
+            <th class="header">Row label</th>
+            <th class="header">Entity</th>
+            <th class="header">Log2(fold change) S2 vs S1</th>
+            <th class="header">t</th>
+            <th class="header">p-value</th>
+            <th class="header">Adjusted p-value</th>
+            <th class="header">B</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="entry in entries">
+            <td>{{entry.rowLabel}}</td>
+            <td>{{entry.biomarker}}</td>
+            <td>{{entry.log2FoldChange}}</td>
+            <td>{{entry.t}}</td>
+            <td>{{entry.pValue}}</td>
+            <td>{{entry.adjustedPValue}}</td>
+            <td>{{entry.B}}</td>
+        </tr>
+    </tbody>
+</table>
